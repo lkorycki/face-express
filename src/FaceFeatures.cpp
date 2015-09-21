@@ -29,7 +29,7 @@ void FaceFeatures::detectFace(Mat& src, Mat& dst)
 {
     // Detect with cascade classifier
     Rect faceROI = Rect();
-    findBestObject(src, faceROI, "/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml");
+    findBestObject(src, faceROI, "../data/haarcascade_frontalface_alt2.xml");
     if(faceROI.area() == 0) return;
 
     ROI[FACE] = dst = src(faceROI);
@@ -352,7 +352,7 @@ void::FaceFeatures::extractNosePoints()
 {
     // Get nose ROI
     Rect noseROI;
-    findBestObject(ROI[NOSE], noseROI, "../datasets/nose_cascade.xml");
+    findBestObject(ROI[NOSE], noseROI, "../data/nose_cascade.xml");
     int off = this->featPointOffsets[NOSE];
 
     if(!noseROI.area() && !this->featurePoints[off].x) return; // if not found
