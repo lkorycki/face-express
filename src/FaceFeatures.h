@@ -18,7 +18,7 @@ public:
     FaceFeatures();
     ~FaceFeatures();
     void detectFace(Mat& src, Mat& dst);
-    void extractFaceFeatures(Mat& src);
+    double* extractFaceFeatures(Mat& src);
     void setROI(Mat& src);
 
 private:
@@ -45,6 +45,8 @@ private:
 
     void extractTeethParam();
     void extractNosePoints();
+
+    void collectFaceFeatures();
 
 public:
     Mat faceFrame, faceFrameVis; // copy for displaying

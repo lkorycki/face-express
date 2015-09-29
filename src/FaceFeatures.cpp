@@ -29,19 +29,25 @@ void FaceFeatures::detectFace(Mat& src, Mat& dst)
 {
     // Detect with cascade classifier
     Rect faceROI = Rect();
-    findBestObject(src, faceROI, "../data/haarcascade_frontalface_alt2.xml");
-    if(faceROI.area() == 0) return;
-
-    ROI[FACE] = dst = src(faceROI);
-
     Mat f = src.clone();
-    rectangle(f, faceROI, CV_RGB(0, 255, 0), 2);
+    findBestObject(src, faceROI, "../data/haarcascade_frontalface_alt2.xml");
+
+    if(faceROI.area() > 0)
+    {
+        ROI[FACE] = dst = src(faceROI);
+        rectangle(f, faceROI, CV_RGB(0, 255, 0), 2);
+    }
+
     imshow("FaceDet", f);
 }
 
-void FaceFeatures::extractFaceFeatures(Mat& src)
+double* FaceFeatures::extractFaceFeatures(Mat& src)
 {
-    if(src.empty()) return; // no face detected
+    if(src.empty()) // no face detected
+    {
+        imshow("FaceFeature", NULL);
+        return NULL;
+    }
 
     this->faceFrame = src.clone();
     this->faceFrameVis = src.clone();
@@ -51,8 +57,10 @@ void FaceFeatures::extractFaceFeatures(Mat& src)
     extractMouthPoints();
     extractTeethParam();
     extractNosePoints();
-
     imshow("FaceFeature", this->faceFrameVis);
+
+    collectFaceFeatures();
+    return this->featureVector;
 }
 
 void FaceFeatures::setROI(Mat& src)
@@ -256,16 +264,16 @@ void FaceFeatures::preprocessMouthROI(Mat& src, Mat& dst)
 void FaceFeatures::findMouthPoints(Mat& src)
 {
     // Find mouth contour
-    findBestContour(src, this->featureContours[MOUTH], this->roiOffsets[MOUTH]);
+    vector<Point> contour;
+    findBestContour(src, contour, this->roiOffsets[MOUTH]);
 
     // Fit ellipse
     RotatedRect elp;
-    if(this->featureContours[MOUTH].size() >= 5)
-    {
-        elp = fitEllipse(this->featureContours[MOUTH]);
-        //ellipse(this->faceFrameVis, elp, Scalar(255,0,120));
-    }
-    else return;
+    if(contour.size() >= 5) this->featureContours[MOUTH] = contour;
+    else if(this->featureContours[MOUTH].size() < 5) return;
+
+    elp = fitEllipse(this->featureContours[MOUTH]);
+    //ellipse(this->faceFrameVis, elp, Scalar(255,0,120));
 
     // Find top and bot corner point
     int off = this->featPointOffsets[MOUTH];
@@ -323,7 +331,7 @@ void FaceFeatures::findMouthPoints(Mat& src)
 
 void::FaceFeatures::extractTeethParam()
 {
-    if(this->featureContours[MOUTH].size() < 5) return; // no mouth detected
+    if(this->featureContours[MOUTH].empty()) return; // no mouth detected
 
     // Get teeth ROI
     int off = 16; // mouth rect
@@ -351,9 +359,9 @@ void::FaceFeatures::extractTeethParam()
 void::FaceFeatures::extractNosePoints()
 {
     // Get nose ROI
+    int off = this->featPointOffsets[NOSE];
     Rect noseROI;
     findBestObject(ROI[NOSE], noseROI, "../data/nose_cascade.xml");
-    int off = this->featPointOffsets[NOSE];
 
     if(!noseROI.area() && !this->featurePoints[off].x) return; // if not found
 
@@ -426,6 +434,11 @@ void FaceFeatures::findBestObject(Mat& src, Rect& dstROI, string dataPath)
     }
 
     if(maxArea != 0) dstROI = bestROI;
+}
+
+void FaceFeatures::collectFaceFeatures()
+{
+
 }
 
 FaceFeatures::~FaceFeatures()
