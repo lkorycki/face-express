@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[])
 {
-    FaceFeatures* faceFeatures = new FaceFeatures();
+    FacialFeatures* facialFeatures = new FacialFeatures();
 
     cout << CV_VERSION << endl;
     VideoCapture cap(0); // open the default camera
@@ -14,14 +14,14 @@ int main(int argc, char *argv[])
     namedWindow("FaceFeature", WINDOW_NORMAL);
     moveWindow("FaceFeature", 300,0);
 
-    namedWindow("work1", WINDOW_NORMAL);
-    moveWindow("work1", 0,300);
-    namedWindow("work2", WINDOW_NORMAL);
-    moveWindow("work2", 300,300);
-    namedWindow("work3", WINDOW_NORMAL);
-    moveWindow("work3", 600,300);
-    namedWindow("work4", WINDOW_NORMAL);
-    moveWindow("work4", 900,300);
+//    namedWindow("work1", WINDOW_NORMAL);
+//    moveWindow("work1", 0,300);
+//    namedWindow("work2", WINDOW_NORMAL);
+//    moveWindow("work2", 300,300);
+//    namedWindow("work3", WINDOW_NORMAL);
+//    moveWindow("work3", 600,300);
+//    namedWindow("work4", WINDOW_NORMAL);
+//    moveWindow("work4", 900,300);
 
     while(1)
     {
@@ -30,12 +30,12 @@ int main(int argc, char *argv[])
         //imshow("Video", frame);
 
         Mat faceFrame = Mat();
-        faceFeatures->detectFace(frame, faceFrame);
-        faceFeatures->extractFaceFeatures(faceFrame);
+        facialFeatures->detectFace(frame, faceFrame);
+        facialFeatures->extractFacialFeatures(faceFrame);
 
         if(waitKey(30) >= 0) break;
     }
 
-    delete faceFeatures;
+    delete facialFeatures;
     return 0;
 }

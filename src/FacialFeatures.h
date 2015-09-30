@@ -1,5 +1,5 @@
-#ifndef FACEFEATURES_H
-#define FACEFEATURES_H
+#ifndef FacialFeatures_H
+#define FacialFeatures_H
 
 #define ROI_NUM 8
 #define OFF_NUM 6
@@ -11,14 +11,14 @@
 
 enum ROItype { L_EYE, R_EYE, L_EB, R_EB, MOUTH, NOSE, TEETH, FACE, NONE };
 
-class FaceFeatures
+class FacialFeatures
 {
 
 public:
-    FaceFeatures();
-    ~FaceFeatures();
+    FacialFeatures();
+    ~FacialFeatures();
     void detectFace(Mat& src, Mat& dst);
-    double* extractFaceFeatures(Mat& src);
+    double* extractFacialFeatures(Mat& src);
     void setROI(Mat& src);
 
 private:
@@ -46,7 +46,7 @@ private:
     void extractTeethParam();
     void extractNosePoints();
 
-    void collectFaceFeatures();
+    void collectFacialFeatures();
 
 public:
     Mat faceFrame, faceFrameVis; // copy for displaying
@@ -54,4 +54,4 @@ public:
     vector<Point>* featureContours;
 };
 
-#endif // FACEFEATURES_H
+#endif // FacialFeatures_H

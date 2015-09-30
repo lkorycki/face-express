@@ -1,9 +1,9 @@
 // [1] RCA: http://www.cse.unsw.edu.au/~tatjana/ICMLWS02/MLCV/Morales.pdf
 // [2] http://sibgrapi.sid.inpe.br/col/sid.inpe.br/sibgrapi/2010/09.08.18.08/doc/CameraReady_70662.pdf
 
-#include "FaceFeatures.h"
+#include "FacialFeatures.h"
 
-FaceFeatures::FaceFeatures()
+FacialFeatures::FacialFeatures()
 {
    // ROI and contours
    for(int i = 0; i < ROI_NUM; i++)  this->ROI[i] = Mat();
@@ -25,7 +25,7 @@ FaceFeatures::FaceFeatures()
    this->featPointOffsets[NOSE] = 20; this->featVecOffsets[NOSE] = 0;
 }
 
-void FaceFeatures::detectFace(Mat& src, Mat& dst)
+void FacialFeatures::detectFace(Mat& src, Mat& dst)
 {
     // Detect with cascade classifier
     Rect faceROI = Rect();
@@ -41,16 +41,17 @@ void FaceFeatures::detectFace(Mat& src, Mat& dst)
     imshow("FaceDet", f);
 }
 
-double* FaceFeatures::extractFaceFeatures(Mat& src)
+double* FacialFeatures::extractFacialFeatures(Mat& src)
 {
     if(src.empty()) // no face detected
     {
         imshow("FaceFeature", NULL);
         return NULL;
     }
-
     this->faceFrame = src.clone();
     this->faceFrameVis = src.clone();
+
+    // Extract facial features points
     setROI(src);
     extractEyesPoints();
     extractEyebrowsPoints();
@@ -59,11 +60,12 @@ double* FaceFeatures::extractFaceFeatures(Mat& src)
     extractNosePoints();
     imshow("FaceFeature", this->faceFrameVis);
 
-    collectFaceFeatures();
+    // Collect (parametrize) facial features
+    collectFacialFeatures();
     return this->featureVector;
 }
 
-void FaceFeatures::setROI(Mat& src)
+void FacialFeatures::setROI(Mat& src)
 {
     float fw = src.cols;
     float fh = src.rows;
@@ -80,8 +82,8 @@ void FaceFeatures::setROI(Mat& src)
 
     ROI[L_EYE] = src(leftEye);
     ROI[R_EYE] = src(rightEye);
-    //rectangle(this->faceFrameVis, leftEye, CV_RGB(0, 0, 255), 1);
-    //rectangle(this->faceFrameVis, rightEye, CV_RGB(0, 0, 255), 1);
+    rectangle(this->faceFrameVis, leftEye, CV_RGB(0, 0, 255), 1);
+    rectangle(this->faceFrameVis, rightEye, CV_RGB(0, 0, 255), 1);
 
     // 2) Eyebrows ROI
     a = 0.38, b = 0.22; // based on [2] a = 0.43 b = 0.2
@@ -92,8 +94,8 @@ void FaceFeatures::setROI(Mat& src)
 
     ROI[L_EB] = src(leftEyeBrow);
     ROI[R_EB] = src(rightEyeBrow);
-    //rectangle(this->faceFrameVis, leftEyeBrow, CV_RGB(0, 200, 0), 1);
-    //rectangle(this->faceFrameVis, rightEyeBrow, CV_RGB(0, 200, 0), 1);
+    rectangle(this->faceFrameVis, leftEyeBrow, CV_RGB(0, 200, 0), 1);
+    rectangle(this->faceFrameVis, rightEyeBrow, CV_RGB(0, 200, 0), 1);
 
     // 3) Mouth ROI
     a *= 0.75, b = 0.8;
@@ -101,7 +103,7 @@ void FaceFeatures::setROI(Mat& src)
     Rect mouth = Rect(roiOffsets[MOUTH].x, roiOffsets[MOUTH].y, 2*a*fw, b*0.5*fh);
 
     ROI[MOUTH] = src(mouth);
-    //rectangle(this->faceFrameVis, mouth, CV_RGB(255, 0, 0), 1);
+    rectangle(this->faceFrameVis, mouth, CV_RGB(255, 0, 0), 1);
 
     // 4) Nose ROI
     a = 0.3, b = 0.3;
@@ -109,12 +111,10 @@ void FaceFeatures::setROI(Mat& src)
     Rect nose = Rect(this->roiOffsets[NOSE].x, this->roiOffsets[NOSE].y, 2*a*fw, b*fh);
 
     ROI[NOSE] = src(nose);
-    //rectangle(this->faceFrameVis, nose, CV_RGB(0, 255, 255), 1);
-
-    // imshow("FaceFeature", this->faceFrameVis);
+    rectangle(this->faceFrameVis, nose, CV_RGB(0, 255, 255), 1);
 }
 
-void FaceFeatures::extractEyesPoints()
+void FacialFeatures::extractEyesPoints()
 {
     Mat leftEye = Mat(ROI[L_EYE].rows, ROI[L_EYE].cols, CV_8U);
     Mat rightEye = Mat(ROI[R_EYE].rows, ROI[R_EYE].cols, CV_8U);
@@ -133,7 +133,7 @@ void FaceFeatures::extractEyesPoints()
     //imshow("RightEye", ROI[R_EYE]);
 }
 
-void FaceFeatures::preprocessEyeROI(Mat& src, Mat& dst)
+void FacialFeatures::preprocessEyeROI(Mat& src, Mat& dst)
 {
     // Create map of eye
     ImageProcessor::createEyeMap(src, dst);
@@ -142,7 +142,7 @@ void FaceFeatures::preprocessEyeROI(Mat& src, Mat& dst)
     ImageProcessor::binarizeEye(dst, dst);
 }
 
-void FaceFeatures::findEyePoints(Mat& src, ROItype roi)
+void FacialFeatures::findEyePoints(Mat& src, ROItype roi)
 {
     // Find eye contour
     vector<Point> contour;
@@ -175,7 +175,7 @@ void FaceFeatures::findEyePoints(Mat& src, ROItype roi)
     this->featureVector[2] = elp.angle; // rotation angle
 }
 
-void::FaceFeatures::extractEyebrowsPoints()
+void::FacialFeatures::extractEyebrowsPoints()
 {
     Mat leftEyebrow = Mat(ROI[L_EB].rows, ROI[L_EB].cols, CV_8U);
     Mat rightEyebrow = Mat(ROI[R_EB].rows, ROI[R_EB].cols, CV_8U);
@@ -194,7 +194,7 @@ void::FaceFeatures::extractEyebrowsPoints()
     //imshow("Right", ROI[R_EB]);
 }
 
-void FaceFeatures::preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi)
+void FacialFeatures::preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi)
 {
     // Grayscale contrast
     cvtColor(src, dst, CV_BGR2GRAY);
@@ -222,7 +222,7 @@ void FaceFeatures::preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi)
     ImageProcessor::binarizeEyebrow(dst, dst, 0.15, this->featurePoints[eyeOff].y-this->roiOffsets[roi].y);
 }
 
-void FaceFeatures::findEyebrowPoints(Mat &src, ROItype roi)
+void FacialFeatures::findEyebrowPoints(Mat &src, ROItype roi)
 {
     // Find eyebrow contour
     vector<Point> contour;
@@ -240,7 +240,7 @@ void FaceFeatures::findEyebrowPoints(Mat &src, ROItype roi)
     for(int i = 0; i < 3; i++) circle(this->faceFrameVis, this->featurePoints[i+off], 2, Scalar(0,255,0), CV_FILLED);   
 }
 
-void FaceFeatures::extractMouthPoints()
+void FacialFeatures::extractMouthPoints()
 {
     Mat mouth = Mat(ROI[MOUTH].rows, ROI[MOUTH].cols, CV_8U);
 
@@ -251,7 +251,7 @@ void FaceFeatures::extractMouthPoints()
     findMouthPoints(mouth);
 }
 
-void FaceFeatures::preprocessMouthROI(Mat& src, Mat& dst)
+void FacialFeatures::preprocessMouthROI(Mat& src, Mat& dst)
 {
     // Create mouth map
     ImageProcessor::createMouthMap(src, dst);
@@ -261,7 +261,7 @@ void FaceFeatures::preprocessMouthROI(Mat& src, Mat& dst)
     ImageProcessor::binarizeMouth(dst, dst, 0.1);
 }
 
-void FaceFeatures::findMouthPoints(Mat& src)
+void FacialFeatures::findMouthPoints(Mat& src)
 {
     // Find mouth contour
     vector<Point> contour;
@@ -329,7 +329,7 @@ void FaceFeatures::findMouthPoints(Mat& src)
     //imshow("Right", rightROI);
 }
 
-void::FaceFeatures::extractTeethParam()
+void::FacialFeatures::extractTeethParam()
 {
     if(this->featureContours[MOUTH].empty()) return; // no mouth detected
 
@@ -349,6 +349,7 @@ void::FaceFeatures::extractTeethParam()
 
     // Get teeth param
     float wb = MathCore::wbParam2D(teethBin);
+    this->featureVector[15] = wb;
     if(wb > 0.1) circle(this->faceFrameVis, Point(teethRect.x + teethRect.width/2, teethRect.y + teethRect.height/2),
                        3, Scalar(0,0,255), CV_FILLED);
 
@@ -356,7 +357,7 @@ void::FaceFeatures::extractTeethParam()
     //imshow("work2", ROI[TEETH]);
 }
 
-void::FaceFeatures::extractNosePoints()
+void::FacialFeatures::extractNosePoints()
 {
     // Get nose ROI
     int off = this->featPointOffsets[NOSE];
@@ -379,7 +380,7 @@ void::FaceFeatures::extractNosePoints()
     //imshow("work1", this->faceFrame(noseROI));
 }
 
-void FaceFeatures::findBestContour(Mat& src, vector<Point>& contour, Point offset, ROItype roi)
+void FacialFeatures::findBestContour(Mat& src, vector<Point>& contour, Point offset, ROItype roi)
 {
     // Find the biggest contour
     vector< vector<Point> > contours;
@@ -408,7 +409,7 @@ void FaceFeatures::findBestContour(Mat& src, vector<Point>& contour, Point offse
     }
 }
 
-void FaceFeatures::findBestObject(Mat& src, Rect& dstROI, string dataPath)
+void FacialFeatures::findBestObject(Mat& src, Rect& dstROI, string dataPath)
 {
     CascadeClassifier cascade = CascadeClassifier(dataPath); // init classifier
     Mat gray;
@@ -436,12 +437,39 @@ void FaceFeatures::findBestObject(Mat& src, Rect& dstROI, string dataPath)
     if(maxArea != 0) dstROI = bestROI;
 }
 
-void FaceFeatures::collectFaceFeatures()
+void FacialFeatures::collectFacialFeatures()
 {
+    // For better coding
+    Point* fp = this->featurePoints;
+    double* fv = this->featureVector;
 
+    // Features parametrization
+    fv[0] = fp[1].x - fp[3].x; // left eye width
+    fv[1] = fp[2].y - fp[0].y; // left eye height
+    fv[2] = fp[6].x - fp[8].x; // right eye width
+    fv[3] = fp[7].y - fp[5].y; // right eye height
+
+    fv[4] = fp[4].y - fp[11].y; // left eye/eyebrow centers |dy|
+    fv[5] = fp[3].y - fp[10].y; // outer left eye/eyebrow points |dy|
+    fv[6] = fp[1].y - fp[12].y; // inner left eye/eyebrow points |dy|
+    fv[7] = fp[9].y - fp[14].y; // right eye/eyebrow centers |dy|
+    fv[8] = fp[6].y - fp[15].y; // outer right eye/eyebrow points |dy|
+    fv[9] = fp[8].y - fp[13].y; // inner right eye/eyebrow points |dy|
+
+    fv[10] = fp[18].x - fp[16].x; // mouth width
+    fv[11] = fp[19].y - fp[17].y; // mouth height
+    fv[12] = fp[19].y - fp[20].y; // lower lip/nose tip |dy|
+    fv[13] = fp[16].y - fp[20].y; // left mouth corner/nose |dy|
+    fv[14] = fp[18].y - fp[20].y; // right mouth corner/nose |dy|
+
+    fv[15]; // teeth param (white pixels to black pixels)
+
+    // Normalization
+    double nf = fp[9].x - fp[4].x; // normalization factor is |dx| between eye centers
+    for(int i = 0; i < 15; i++) fv[i] /= nf;
 }
 
-FaceFeatures::~FaceFeatures()
+FacialFeatures::~FacialFeatures()
 {
     delete[] this->featureContours;
     delete[] this->featurePoints;
