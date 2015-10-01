@@ -313,9 +313,14 @@ void FacialFeatures::findMouthPoints(Mat& src)
     findBestContour(rightROI, rightCorner, rightOffset);
 
     // Get left and right corner point
-    Point p0;
-    ImageProcessor::findCorners(leftCorner, this->featurePoints[off], p0); // left
-    ImageProcessor::findCorners(rightCorner, p0, this->featurePoints[off+2]); // right
+    if(!leftCorner.empty() && !rightCorner.empty())
+    {
+        Point p0;
+        ImageProcessor::findCorners(leftCorner, this->featurePoints[off], p0); // left
+        ImageProcessor::findCorners(rightCorner, p0, this->featurePoints[off+2]); // right
+    }
+    else if(!this->featurePoints[off].x || !this->featurePoints[off+2].x) return;
+
     for(int i = 0; i < 4; i++)
     {
         line(this->faceFrameVis, this->featurePoints[i+off], this->featurePoints[((i+1)%4)+off], Scalar(120,0,255));

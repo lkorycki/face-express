@@ -3,8 +3,8 @@
 
 #define ROI_NUM 8
 #define OFF_NUM 6
-#define FEAT_POINTS 20
-#define FEAT_NUM 20
+#define FEAT_POINTS 21
+#define FEAT_NUM 16
 
 
 #include "Headers.h"
