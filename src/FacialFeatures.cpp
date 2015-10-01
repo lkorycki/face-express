@@ -315,9 +315,15 @@ void FacialFeatures::findMouthPoints(Mat& src)
     // Get left and right corner point
     if(!leftCorner.empty() && !rightCorner.empty())
     {
-        Point p0;
-        ImageProcessor::findCorners(leftCorner, this->featurePoints[off], p0); // left
-        ImageProcessor::findCorners(rightCorner, p0, this->featurePoints[off+2]); // right
+        Point p0, pLeft, pRight;
+        ImageProcessor::findCorners(leftCorner, pLeft, p0);
+        ImageProcessor::findCorners(rightCorner, p0, pRight);
+
+        if(pLeft.x != INT_MAX && pRight.x != -1)
+        {
+            this->featurePoints[off] = pLeft; // left
+            this->featurePoints[off+2] = pRight; // right
+        }
     }
     else if(!this->featurePoints[off].x || !this->featurePoints[off+2].x) return;
 
