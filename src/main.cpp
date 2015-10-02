@@ -1,13 +1,15 @@
 #include "Headers.h"
 
+void cls();
+
 int main(int argc, char *argv[])
 {
-    FacialFeatures* facialFeatures = new FacialFeatures();
+    // Inits
+    Logger* log = new Logger();
 
-    cout << CV_VERSION << endl;
+    FacialFeatures* facialFeatures = new FacialFeatures();
     VideoCapture cap(0); // open the default camera
     if(!cap.isOpened()) return 1; // check if we succeeded
-    cout << "Camera detected!\n" << endl;
 
     namedWindow("FaceDet", WINDOW_NORMAL);
     moveWindow("FaceDet", 0,0);
@@ -31,11 +33,16 @@ int main(int argc, char *argv[])
 
         Mat faceFrame = Mat();
         facialFeatures->detectFace(frame, faceFrame);
-        facialFeatures->extractFacialFeatures(faceFrame);
+        double* featureVector = facialFeatures->extractFacialFeatures(faceFrame);
 
-        if(waitKey(30) >= 0) break;
+        log->show(featureVector);
+
+        if(waitKey(1) >= 0) break;
     }
 
+    delete log;
     delete facialFeatures;
     return 0;
 }
+
+
