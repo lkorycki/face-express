@@ -4,11 +4,11 @@ Logger::Logger()
 {
 }
 
-void Logger::show(const double* fv)
+void Logger::show(const double* fv, bool toFile)
 {
     cls();
     showHeader();
-    showFeatureVector(fv);
+    showFeatureVector(fv, toFile);
 }
 
 void Logger::showHeader()
@@ -20,7 +20,7 @@ void Logger::showHeader()
     cout << "...\n";
 }
 
-void Logger::showFeatureVector(const double* fv)
+void Logger::showFeatureVector(const double* fv, bool toFile)
 {
     cout << "---------- Feature vector ----------\n";
 
@@ -45,6 +45,8 @@ void Logger::showFeatureVector(const double* fv)
     cout << "TEETH W2B_PARAM: " << fv[15] << endl;
 
     cout << "------------------------------------\n";
+
+    // TODO: wrtiting to file
 }
 
 void Logger::cls()

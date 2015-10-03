@@ -9,9 +9,9 @@ class Logger
 public:
     Logger();
     ~Logger();
-    void show(const double* fv);
+    void show(const double* fv, bool toFile = false);
     void showHeader();
-    void showFeatureVector(const double* fv);
+    void showFeatureVector(const double* fv, bool toFile);
 
 private:
     void cls();

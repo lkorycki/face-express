@@ -6,8 +6,9 @@
 #define FEAT_POINTS 21
 #define FEAT_NUM 16
 
-
 #include "Headers.h"
+#include "MathCore.h"
+#include "ImageProcessor.h"
 
 enum ROItype { L_EYE, R_EYE, L_EB, R_EB, MOUTH, NOSE, TEETH, FACE, NONE };
 

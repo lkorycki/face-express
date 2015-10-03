@@ -2,6 +2,7 @@
 #define IMAGEPROCESSOR_H
 
 #include "Headers.h"
+#include "MathCore.h"
 
 class ImageProcessor
 {
