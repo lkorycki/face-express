@@ -13,7 +13,7 @@ public:
     ~App();
     void runCam(int camId);
     void runImage(string imgPath, bool toFile = false);
-    void captureSequence(int camId, int frames, int fps, bool features);
+    void captureSequence(int camId, int frames, int delay, bool features);
 
 private:
     Logger* log;
@@ -21,8 +21,6 @@ private:
 
     map<string, string> pathMap;
     void ensureDirectories(map<string, string> pathMap);
-
-
 };
 
 #endif // APP_H

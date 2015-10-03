@@ -77,7 +77,6 @@ void App::captureSequence(int camId, int frames, int delay, bool features)
     for(int i = 0; i < frames; i++)
     {
         Mat frame; cap >> frame;
-        //cout << frame.type() << endl;
         resize(frame, frame, Size(860, 640), 1.0, 1.0, INTER_CUBIC);
         imshow("FaceDet", frame);
         seq.push_back(frame);

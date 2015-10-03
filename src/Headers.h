@@ -2,7 +2,6 @@
 #define HEADERS_H
 
 #include <math.h>
-//#include <map>
 #include <iostream>
 #include <boost/filesystem.hpp>
 using namespace std;
