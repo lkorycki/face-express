@@ -11,7 +11,7 @@ public:
     ~Logger();
     void show(const double* fv, bool toFile = false);
     void showHeader();
-    void showFeatureVector(const double* fv, bool toFile);
+    void showFeatureVector(const double* fv, bool toFile = false);
 
 private:
     void cls();
