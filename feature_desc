@@ -1,0 +1,60 @@
+
+*** FEATURE_POINTS ***
+
+// EYES
+[0]: left eye TOP
+[1]: left eye RIGHT
+[2]: left eye BOTTOM
+[3]: left eye LEFT
+[4]: left eye CENTER
+
+[5]: right eye TOP
+[6]: right eye RIGHT
+[7]: right eye BOTTOM
+[8]: right eye LEFT
+[9]: right eye CENTER
+
+// EYEBROWS
+[10]: left eyebrow LEFT
+[11]: left eyebrow CENTER
+[12]: left eyebrow RIGHT
+
+[13]: right eyebrow LEFT
+[14]: right eyebrow CENTER
+[15]: right eyebrow RIGHT
+
+// MOUTH
+[16]: mouth LEFT
+[17]: mouth TOP
+[18]: mouth RIGHT
+[19]: mouth BOTTOM
+
+// NOSE
+[20]: nose CENTER (tip)
+
+*** FEATURE_VECTOR ***
+
+[0] left eye WIDTH
+[1] left eye HEIGHT
+[2] right eye WIDTH
+[3] right eye HEIGHT
+
+[4] (left center) eye - eyebrow |dY|
+[5] (left outer) eye - eyebrow |dY|
+[6] (left inner) eye - eyebrow |dY|
+[7] (right eye) - eyebrow |dY|
+[8] (right outer) eye - eyebrow |dY|
+[9] (right inner) eye - eyebrow |dY|
+
+[10] mouth WIDTH
+[11] mouth HEIGHT
+[12] lower lip - nose tip |dY|
+[13] left mouth corner - nose tip |dY|
+[14] right mouth corner - nose tip |dY|
+
+[15] teeth W2B_PARAM
+
+*All features are normalized using factor: |dX| distance between eye centers 
+
+
+
