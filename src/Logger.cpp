@@ -61,7 +61,7 @@ void Logger::writeToFile(const double* fv, string path)
     ofstream out;
     out.open(path);
 
-    for(int i = 0; i < 21; i++)
+    for(int i = 0; i < 16; i++)
     {
        stringstream ss; ss << i;
        out << "X" << ss.str() << "\t" << fv[i] << endl;
