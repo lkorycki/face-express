@@ -3,12 +3,17 @@
 
 #include "Headers.h"
 #include "MathCore.h"
+#include "FacialFeatures.h"
+class FacialFeatures;
 
 class ImageProcessor
 {
 
 public:
     ImageProcessor();
+    ~ImageProcessor();
+    static void setFF(FacialFeatures* ff);
+
     static void negateMat(Mat& src, Mat& dst);
     static void clearBinBorder(Mat& src, Mat& dst); // default: white to black
     static void clearGrayBorderV(Mat &src, Mat &dst, int lw, float lmax, int rw = 0, float rmax = 0);
@@ -23,6 +28,12 @@ public:
     static void binarizeMouth(Mat& src, Mat& dst, float p);
     static void binarizeTeeth(Mat& src, Mat& dst, int t);
 
+    static void preprocessEyeROI(Mat& src, Mat& dst);
+    static void preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi);
+    static void preprocessMouthROI(Mat& src, Mat& dst);
+
+private:
+    static FacialFeatures* ff;
 };
 
 #endif // IMAGEPROCESSOR_H

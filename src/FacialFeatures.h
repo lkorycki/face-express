@@ -14,6 +14,7 @@
 class FacialFeatures
 {
 
+friend class ImageProcessor;
 friend class ImageAnalyzer;
 
 public:
@@ -31,14 +32,8 @@ private:
     int featVecOffsets[OFF_NUM];
 
     void extractEyesPoints();
-    void preprocessEyeROI(Mat& src, Mat& dst);
-
     void extractEyebrowsPoints();
-    void preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi);
-
     void extractMouthPoints();
-    void preprocessMouthROI(Mat& src, Mat& dst);
-
     void extractTeethParam();
     void extractNosePoints();
 

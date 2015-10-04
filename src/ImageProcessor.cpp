@@ -1,7 +1,14 @@
 #include "ImageProcessor.h"
 
+FacialFeatures* ImageProcessor::ff;
+
 ImageProcessor::ImageProcessor()
 {
+}
+
+void ImageProcessor::setFF(FacialFeatures *ff)
+{
+    ImageProcessor::ff = ff;
 }
 
 void ImageProcessor::createEyeMap(Mat& src, Mat& dst)
@@ -253,6 +260,58 @@ void ImageProcessor::createMouthCornerMap(Mat& src, Mat& dst, float p)
     int thresh = MathCore::histThresh2D(map, p);
     threshold(map, dst, thresh, 255, THRESH_BINARY);
     negateMat(dst, dst);
+}
+
+void ImageProcessor::preprocessEyeROI(Mat& src, Mat& dst)
+{
+    // Create map of eye
+    createEyeMap(src, dst);
+
+    // Binarize eye
+    binarizeEye(dst, dst);
+}
+
+void ImageProcessor::preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi)
+{
+    // Grayscale contrast
+    cvtColor(src, dst, CV_BGR2GRAY);
+    equalizeHist(dst, dst);
+
+    // Binarize eyebrows
+    int eyeOff;
+    float lw, lm, rw, rm, tw, tm, bw, bm;
+
+    tw = 0.15; tm = 0.75; bw = 0.2; bm = 0.75;
+    if(roi == L_EB)
+    {
+        eyeOff = 0;
+        lw = 0.25; lm = 0.85; rw = 0.1; rm = 0.6;
+    }
+    else
+    {
+        eyeOff = 5;
+        lw = 0.1; lm = 0.6; rw = 0.25; rm = 0.8;
+    }
+
+    // Mask gray borders and binarize
+    clearGrayBorderV(dst, dst, lw*dst.cols, lm, rw*dst.cols, rm);
+    clearGrayBorderH(dst, dst, tw*dst.rows, tm, bw*dst.rows, bm);
+    binarizeEyebrow(dst, dst, 0.15, ff->featurePoints[eyeOff].y-ff->roiOffsets[roi].y);
+}
+
+void ImageProcessor::preprocessMouthROI(Mat& src, Mat& dst)
+{
+    // Create mouth map
+    createMouthMap(src, dst);
+    clearGrayBorderH(dst, dst, 0.35*dst.rows, 1.0, 0.1*dst.rows, 1.0);
+
+    // Binarize
+    binarizeMouth(dst, dst, 0.1);
+}
+
+ImageProcessor::~ImageProcessor()
+{
+    ImageProcessor::ff = NULL;
 }
 
 

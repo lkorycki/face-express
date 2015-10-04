@@ -25,6 +25,7 @@ FacialFeatures::FacialFeatures()
    this->featPointOffsets[NOSE] = 20; this->featVecOffsets[NOSE] = 0;
 
    ImageAnalyzer::setFF(this);
+   ImageProcessor::setFF(this);
 }
 
 void FacialFeatures::detectFace(Mat& src, Mat& dst)
@@ -123,8 +124,8 @@ void FacialFeatures::extractEyesPoints()
     Mat rightEye = Mat(ROI[R_EYE].rows, ROI[R_EYE].cols, CV_8U);
 
     // Preprocess eye ROI
-    preprocessEyeROI(ROI[L_EYE], leftEye);
-    preprocessEyeROI(ROI[R_EYE], rightEye);
+    ImageProcessor::preprocessEyeROI(ROI[L_EYE], leftEye);
+    ImageProcessor::preprocessEyeROI(ROI[R_EYE], rightEye);
 
     // Find features
     ImageAnalyzer::findEyePoints(leftEye, L_EYE);
@@ -136,23 +137,14 @@ void FacialFeatures::extractEyesPoints()
     //imshow("RightEye", ROI[R_EYE]);
 }
 
-void FacialFeatures::preprocessEyeROI(Mat& src, Mat& dst)
-{
-    // Create map of eye
-    ImageProcessor::createEyeMap(src, dst);
-
-    // Binarize eye
-    ImageProcessor::binarizeEye(dst, dst);
-}
-
 void::FacialFeatures::extractEyebrowsPoints()
 {
     Mat leftEyebrow = Mat(ROI[L_EB].rows, ROI[L_EB].cols, CV_8U);
     Mat rightEyebrow = Mat(ROI[R_EB].rows, ROI[R_EB].cols, CV_8U);
 
     // Preprocess eyebrow ROI
-    preprocessEyebrowROI(ROI[L_EB], leftEyebrow, L_EB);
-    preprocessEyebrowROI(ROI[R_EB], rightEyebrow, R_EB);
+    ImageProcessor::preprocessEyebrowROI(ROI[L_EB], leftEyebrow, L_EB);
+    ImageProcessor::preprocessEyebrowROI(ROI[R_EB], rightEyebrow, R_EB);
 
     // Find features
     ImageAnalyzer::findEyebrowPoints(leftEyebrow, L_EB);
@@ -164,53 +156,15 @@ void::FacialFeatures::extractEyebrowsPoints()
     //imshow("Right", ROI[R_EB]);
 }
 
-void FacialFeatures::preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi)
-{
-    // Grayscale contrast
-    cvtColor(src, dst, CV_BGR2GRAY);
-    equalizeHist(dst, dst);
-
-    // Binarize eyebrows
-    int eyeOff;
-    float lw, lm, rw, rm, tw, tm, bw, bm;
-
-    tw = 0.15; tm = 0.75; bw = 0.2; bm = 0.75;
-    if(roi == L_EB)
-    {
-        eyeOff = 0;
-        lw = 0.25; lm = 0.85; rw = 0.1; rm = 0.6;
-    }
-    else
-    {
-        eyeOff = 5;
-        lw = 0.1; lm = 0.6; rw = 0.25; rm = 0.8;
-    }
-
-    // Mask gray borders and binarize
-    ImageProcessor::clearGrayBorderV(dst, dst, lw*dst.cols, lm, rw*dst.cols, rm);
-    ImageProcessor::clearGrayBorderH(dst, dst, tw*dst.rows, tm, bw*dst.rows, bm);
-    ImageProcessor::binarizeEyebrow(dst, dst, 0.15, this->featurePoints[eyeOff].y-this->roiOffsets[roi].y);
-}
-
 void FacialFeatures::extractMouthPoints()
 {
     Mat mouth = Mat(ROI[MOUTH].rows, ROI[MOUTH].cols, CV_8U);
 
     // Preprocess mouth ROI
-    preprocessMouthROI(ROI[MOUTH], mouth);
+    ImageProcessor::preprocessMouthROI(ROI[MOUTH], mouth);
 
     // Get features
     ImageAnalyzer::findMouthPoints(mouth);
-}
-
-void FacialFeatures::preprocessMouthROI(Mat& src, Mat& dst)
-{
-    // Create mouth map
-    ImageProcessor::createMouthMap(src, dst);
-    ImageProcessor::clearGrayBorderH(dst, dst, 0.35*dst.rows, 1.0, 0.1*dst.rows, 1.0);
-
-    // Binarize
-    ImageProcessor::binarizeMouth(dst, dst, 0.1);
 }
 
 void::FacialFeatures::extractTeethParam()
@@ -263,8 +217,6 @@ void::FacialFeatures::extractNosePoints()
 
     //imshow("work1", this->faceFrame(noseROI));
 }
-
-
 
 void FacialFeatures::collectFacialFeatures()
 {
