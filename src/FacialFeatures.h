@@ -9,11 +9,12 @@
 #include "Headers.h"
 #include "MathCore.h"
 #include "ImageProcessor.h"
-
-enum ROItype { L_EYE, R_EYE, L_EB, R_EB, MOUTH, NOSE, TEETH, FACE, NONE };
+#include "ImageAnalyzer.h"
 
 class FacialFeatures
 {
+
+friend class ImageAnalyzer;
 
 public:
     FacialFeatures();
@@ -29,20 +30,14 @@ private:
     int featPointOffsets[OFF_NUM];
     int featVecOffsets[OFF_NUM];
 
-    void findBestContour(Mat& src, vector<Point>& contour, Point offset, ROItype roi = NONE);
-    void findBestObject(Mat& src, Rect& dstROI, string dataPath);
-
     void extractEyesPoints();
     void preprocessEyeROI(Mat& src, Mat& dst);
-    void findEyePoints(Mat& src, ROItype roi);
 
     void extractEyebrowsPoints();
     void preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi);
-    void findEyebrowPoints(Mat& src, ROItype roi);
 
     void extractMouthPoints();
     void preprocessMouthROI(Mat& src, Mat& dst);
-    void findMouthPoints(Mat& src);
 
     void extractTeethParam();
     void extractNosePoints();
@@ -53,6 +48,7 @@ public:
     Mat faceFrame, faceFrameVis; // copy for displaying
     Point roiOffsets[OFF_NUM];
     vector<Point>* featureContours;
+
 };
 
 #endif // FacialFeatures_H

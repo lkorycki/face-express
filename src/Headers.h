@@ -13,5 +13,6 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 using namespace cv;
 
+enum ROItype { L_EYE, R_EYE, L_EB, R_EB, MOUTH, NOSE, TEETH, FACE, NONE };
 
 #endif // HEADERS_H

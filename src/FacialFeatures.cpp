@@ -23,6 +23,8 @@ FacialFeatures::FacialFeatures()
    this->featPointOffsets[R_EB] = 13; this->featVecOffsets[R_EB] = 0;
    this->featPointOffsets[MOUTH] = 16; this->featVecOffsets[MOUTH] = 0;
    this->featPointOffsets[NOSE] = 20; this->featVecOffsets[NOSE] = 0;
+
+   ImageAnalyzer::setFF(this);
 }
 
 void FacialFeatures::detectFace(Mat& src, Mat& dst)
@@ -30,7 +32,7 @@ void FacialFeatures::detectFace(Mat& src, Mat& dst)
     // Detect with cascade classifier
     Rect faceROI = Rect();
     Mat f = src.clone();
-    findBestObject(src, faceROI, "../data/haarcascade_frontalface_alt2.xml");
+    ImageAnalyzer::findBestObject(src, faceROI, "../data/haarcascade_frontalface_alt2.xml");
 
     if(faceROI.area() > 0)
     {
@@ -125,8 +127,8 @@ void FacialFeatures::extractEyesPoints()
     preprocessEyeROI(ROI[R_EYE], rightEye);
 
     // Find features
-    findEyePoints(leftEye, L_EYE);
-    findEyePoints(rightEye, R_EYE);
+    ImageAnalyzer::findEyePoints(leftEye, L_EYE);
+    ImageAnalyzer::findEyePoints(rightEye, R_EYE);
 
     //imshow("work1", leftEye);
     //imshow("work2", rightEye);
@@ -143,39 +145,6 @@ void FacialFeatures::preprocessEyeROI(Mat& src, Mat& dst)
     ImageProcessor::binarizeEye(dst, dst);
 }
 
-void FacialFeatures::findEyePoints(Mat& src, ROItype roi)
-{
-    // Find eye contour
-    vector<Point> contour;
-    findBestContour(src, contour, this->roiOffsets[roi], roi);
-
-    // Fit ellipse
-    if(contour.size() >= 5)
-    {
-        this->featureContours[roi] = contour;
-    }
-    else if(this->featureContours[roi].empty()) return;
-
-    // Get eye points
-    RotatedRect elp = fitEllipse(this->featureContours[roi]);
-    Point2f points[4];
-    elp.points(points);
-
-    int off = this->featPointOffsets[roi];
-    if(roi == L_EYE) this->featurePoints[4] = elp.center;
-    else if(roi == R_EYE) this->featurePoints[9] = elp.center;
-
-    for(int i = 0; i < 4; i++)  this->featurePoints[i+off] = Point((points[(i+1)%4].x + points[i].x)/2, (points[(i+1)%4].y + points[i].y)/2);
-    for(int i = 0; i < 5; i++) circle(this->faceFrameVis, this->featurePoints[i+off], 2, Scalar(0,255,0), CV_FILLED);
-    ellipse(this->faceFrameVis, elp, Scalar(255,255,0));
-
-    // Get eye features
-    //this->featureVector[0] = elp_points[0]; // eye center
-    this->featureVector[0] = elp.boundingRect().width; // eye width
-    this->featureVector[1] = elp.boundingRect().height; // eye height
-    this->featureVector[2] = elp.angle; // rotation angle
-}
-
 void::FacialFeatures::extractEyebrowsPoints()
 {
     Mat leftEyebrow = Mat(ROI[L_EB].rows, ROI[L_EB].cols, CV_8U);
@@ -186,8 +155,8 @@ void::FacialFeatures::extractEyebrowsPoints()
     preprocessEyebrowROI(ROI[R_EB], rightEyebrow, R_EB);
 
     // Find features
-    findEyebrowPoints(leftEyebrow, L_EB);
-    findEyebrowPoints(rightEyebrow, R_EB);
+    ImageAnalyzer::findEyebrowPoints(leftEyebrow, L_EB);
+    ImageAnalyzer::findEyebrowPoints(rightEyebrow, R_EB);
 
     //imshow("work1", leftEyebrow);
     //imshow("work2", rightEyebrow);
@@ -223,24 +192,6 @@ void FacialFeatures::preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi)
     ImageProcessor::binarizeEyebrow(dst, dst, 0.15, this->featurePoints[eyeOff].y-this->roiOffsets[roi].y);
 }
 
-void FacialFeatures::findEyebrowPoints(Mat &src, ROItype roi)
-{
-    // Find eyebrow contour
-    vector<Point> contour;
-    findBestContour(src, contour, this->roiOffsets[roi]);
-    if(!contour.empty()) this->featureContours[roi] = contour;
-    else if(this->featureContours[roi].empty()) return;
-
-    // Get eyebrow points
-    int off = this->featPointOffsets[roi];
-    ImageProcessor::findCorners(this->featureContours[roi], this->featurePoints[off], this->featurePoints[off+2]); // left, right
-    Moments m = moments(this->featureContours[roi], true);
-    this->featurePoints[off+1] = Point(m.m10/m.m00, m.m01/m.m00); // center
-    line(this->faceFrameVis, this->featurePoints[off], this->featurePoints[off+1], Scalar(0,255,255));
-    line(this->faceFrameVis, this->featurePoints[off+1], this->featurePoints[off+2], Scalar(0,255,255));
-    for(int i = 0; i < 3; i++) circle(this->faceFrameVis, this->featurePoints[i+off], 2, Scalar(0,255,0), CV_FILLED);   
-}
-
 void FacialFeatures::extractMouthPoints()
 {
     Mat mouth = Mat(ROI[MOUTH].rows, ROI[MOUTH].cols, CV_8U);
@@ -249,7 +200,7 @@ void FacialFeatures::extractMouthPoints()
     preprocessMouthROI(ROI[MOUTH], mouth);
 
     // Get features
-    findMouthPoints(mouth);
+    ImageAnalyzer::findMouthPoints(mouth);
 }
 
 void FacialFeatures::preprocessMouthROI(Mat& src, Mat& dst)
@@ -260,85 +211,6 @@ void FacialFeatures::preprocessMouthROI(Mat& src, Mat& dst)
 
     // Binarize
     ImageProcessor::binarizeMouth(dst, dst, 0.1);
-}
-
-void FacialFeatures::findMouthPoints(Mat& src)
-{
-    // Find mouth contour
-    vector<Point> contour;
-    findBestContour(src, contour, this->roiOffsets[MOUTH]);
-
-    // Fit ellipse
-    RotatedRect elp;
-    if(contour.size() >= 5) this->featureContours[MOUTH] = contour;
-    else if(this->featureContours[MOUTH].size() < 5) return;
-
-    elp = fitEllipse(this->featureContours[MOUTH]);
-    //ellipse(this->faceFrameVis, elp, Scalar(255,0,120));
-
-    // Find top and bot corner point
-    int off = this->featPointOffsets[MOUTH];
-    Point2f points[4];
-    elp.points(points);
-
-    this->featurePoints[off+1] = Point((points[0].x+points[1].x)/2, (points[0].y+points[1].y)/2); // top
-    this->featurePoints[off+3] = Point((points[2].x+points[3].x)/2, (points[2].y+points[3].y)/2); // bottom
-
-    // Extract left and right corner ROI
-    Point lc = Point((points[0].x+points[3].x)/2, (points[0].y+points[3].y)/2);
-    Point rc = Point((points[1].x+points[2].x)/2, (points[1].y+points[2].y)/2);
-    //circle(this->faceFrameVis, lc, 3, Scalar(255,0,0), CV_FILLED);
-    //circle(this->faceFrameVis, rc, 3, Scalar(255,0,0), CV_FILLED);
-
-    float a = 0.2;
-    int fw = src.cols, fh = src.rows;
-    Point leftOffset = Point(lc.x-a*fw, lc.y-a*fh); Point rightOffset = Point(rc.x-a*fw, rc.y-a*fh);
-    Rect lr = Rect(leftOffset.x, leftOffset.y, 2*a*fw, 2*a*fh);
-    Rect rr = Rect(rightOffset.x, rightOffset.y, 2*a*fw, 2*a*fh);
-    if(lr.x + lr.width > this->faceFrame.cols || rr.x + rr.width > this->faceFrame.cols
-            || lr.y + lr.height > this->faceFrame.rows || rr.y + rr.height > this->faceFrame.rows
-            || lr.x < 0 || lr.y < 0 || rr.x < 0 || rr.y < 0) return;
-
-    Mat leftROI = this->faceFrame(lr);
-    Mat rightROI = this->faceFrame(rr);
-    //rectangle(this->faceFrameVis, lr, Scalar(0,0,255));
-    //rectangle(this->faceFrameVis, rr, Scalar(0,0,255));
-
-    // Create mouth corners binary map
-    ImageProcessor::createMouthCornerMap(leftROI, leftROI, 0.05);
-    ImageProcessor::createMouthCornerMap(rightROI, rightROI, 0.05);
-
-    // Find their contours
-    vector<Point> leftCorner, rightCorner;
-    findBestContour(leftROI, leftCorner, leftOffset);
-    findBestContour(rightROI, rightCorner, rightOffset);
-
-    // Get left and right corner point
-    if(!leftCorner.empty() && !rightCorner.empty())
-    {
-        Point p0, pLeft, pRight;
-        ImageProcessor::findCorners(leftCorner, pLeft, p0);
-        ImageProcessor::findCorners(rightCorner, p0, pRight);
-
-        if(pLeft.x != INT_MAX && pRight.x != -1)
-        {
-            this->featurePoints[off] = pLeft; // left
-            this->featurePoints[off+2] = pRight; // right
-        }
-    }
-    else if(!this->featurePoints[off].x || !this->featurePoints[off+2].x) return;
-
-    for(int i = 0; i < 4; i++)
-    {
-        line(this->faceFrameVis, this->featurePoints[i+off], this->featurePoints[((i+1)%4)+off], Scalar(120,0,255));
-    }
-    circle(this->faceFrameVis, this->featurePoints[off+1], 2, Scalar(0,255,0), CV_FILLED); // top
-    circle(this->faceFrameVis, this->featurePoints[off+3], 2, Scalar(0,255,0), CV_FILLED); // bot
-    circle(this->faceFrameVis, this->featurePoints[off], 2, Scalar(0,255,0), CV_FILLED); // left
-    circle(this->faceFrameVis, this->featurePoints[off+2], 2, Scalar(0,255,0), CV_FILLED); //right
-
-    //imshow("Left", leftROI);
-    //imshow("Right", rightROI);
 }
 
 void::FacialFeatures::extractTeethParam()
@@ -374,7 +246,7 @@ void::FacialFeatures::extractNosePoints()
     // Get nose ROI
     int off = this->featPointOffsets[NOSE];
     Rect noseROI;
-    findBestObject(ROI[NOSE], noseROI, "../data/nose_cascade.xml");
+    ImageAnalyzer::findBestObject(ROI[NOSE], noseROI, "../data/nose_cascade.xml");
 
     if(!noseROI.area() && !this->featurePoints[off].x) return; // if not found
 
@@ -392,62 +264,7 @@ void::FacialFeatures::extractNosePoints()
     //imshow("work1", this->faceFrame(noseROI));
 }
 
-void FacialFeatures::findBestContour(Mat& src, vector<Point>& contour, Point offset, ROItype roi)
-{
-    // Find the biggest contour
-    vector< vector<Point> > contours;
-    int idx = -1;
-    vector<Vec4i> hierarchy;
-    double maxArea = -1;
-    bool eye = false; if(roi == L_EYE || roi == R_EYE) eye = true;
 
-    findContours(src.clone(), contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, offset);
-    for(int i = 0; i < contours.size(); i++)
-    {
-        double area = contourArea(contours[i]);
-        if(!eye && area < maxArea) continue;
-        else if(eye && (area < maxArea || boundingRect(contours[i]).width > 0.7*src.cols)) continue; // to distinguish eyebrows
-        else
-        {
-            idx = i;
-            maxArea = area;
-        }
-    }
-
-    if(idx != -1)
-    {
-        contour = contours[idx];
-        //drawContours(this->faceFrame, contours, idx, Scalar(0,255,255), 1);
-    }
-}
-
-void FacialFeatures::findBestObject(Mat& src, Rect& dstROI, string dataPath)
-{
-    CascadeClassifier cascade = CascadeClassifier(dataPath); // init classifier
-    Mat gray;
-    cvtColor(src, gray, CV_BGR2GRAY);
-
-    // Find objects
-    vector< Rect_<int> > objects;
-    cascade.detectMultiScale(gray, objects);
-
-    Rect bestROI;
-    double maxArea = 0;
-
-    for(int i = 0; i < objects.size(); i++)
-    {
-        Rect ROI = objects[i];
-
-        double area = ROI.area();
-        if(area > maxArea)
-        {
-            maxArea = area;
-            bestROI = ROI;
-        }
-    }
-
-    if(maxArea != 0) dstROI = bestROI;
-}
 
 void FacialFeatures::collectFacialFeatures()
 {

@@ -21,6 +21,7 @@ private:
     map<string, string> pathMap;
     void ensureDirectories(map<string, string> pathMap);
     void ensureDirectory(string path, bool inout = false);
+
 };
 
 #endif // APP_H

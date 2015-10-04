@@ -17,6 +17,7 @@ public:
 
 private:
     void cls();
+
 };
 
 #endif // LOGGER_H
