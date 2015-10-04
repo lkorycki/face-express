@@ -9,9 +9,11 @@ class Logger
 public:
     Logger();
     ~Logger();
-    void show(const double* fv, bool toFile = false);
+    void show(const double* fv);
     void showHeader();
-    void showFeatureVector(const double* fv, bool toFile = false);
+    void showFeatureVector(const double* fv);
+    void writeToFile(const double* fv, string path);
+    static string getTime();
 
 private:
     void cls();

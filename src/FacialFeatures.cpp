@@ -82,8 +82,8 @@ void FacialFeatures::setROI(Mat& src)
 
     ROI[L_EYE] = src(leftEye);
     ROI[R_EYE] = src(rightEye);
-    rectangle(this->faceFrameVis, leftEye, CV_RGB(0, 0, 255), 1);
-    rectangle(this->faceFrameVis, rightEye, CV_RGB(0, 0, 255), 1);
+    //rectangle(this->faceFrameVis, leftEye, CV_RGB(0, 0, 255), 1);
+    //rectangle(this->faceFrameVis, rightEye, CV_RGB(0, 0, 255), 1);
 
     // 2) Eyebrows ROI
     a = 0.38, b = 0.22; // based on [2] a = 0.43 b = 0.2
@@ -94,8 +94,8 @@ void FacialFeatures::setROI(Mat& src)
 
     ROI[L_EB] = src(leftEyeBrow);
     ROI[R_EB] = src(rightEyeBrow);
-    rectangle(this->faceFrameVis, leftEyeBrow, CV_RGB(0, 200, 0), 1);
-    rectangle(this->faceFrameVis, rightEyeBrow, CV_RGB(0, 200, 0), 1);
+    //rectangle(this->faceFrameVis, leftEyeBrow, CV_RGB(0, 200, 0), 1);
+    //rectangle(this->faceFrameVis, rightEyeBrow, CV_RGB(0, 200, 0), 1);
 
     // 3) Mouth ROI
     a *= 0.75, b = 0.8;
@@ -103,7 +103,7 @@ void FacialFeatures::setROI(Mat& src)
     Rect mouth = Rect(roiOffsets[MOUTH].x, roiOffsets[MOUTH].y, 2*a*fw, b*0.5*fh);
 
     ROI[MOUTH] = src(mouth);
-    rectangle(this->faceFrameVis, mouth, CV_RGB(255, 0, 0), 1);
+    //rectangle(this->faceFrameVis, mouth, CV_RGB(255, 0, 0), 1);
 
     // 4) Nose ROI
     a = 0.3, b = 0.3;
@@ -111,7 +111,7 @@ void FacialFeatures::setROI(Mat& src)
     Rect nose = Rect(this->roiOffsets[NOSE].x, this->roiOffsets[NOSE].y, 2*a*fw, b*fh);
 
     ROI[NOSE] = src(nose);
-    rectangle(this->faceFrameVis, nose, CV_RGB(0, 255, 255), 1);
+    //rectangle(this->faceFrameVis, nose, CV_RGB(0, 255, 255), 1);
 }
 
 void FacialFeatures::extractEyesPoints()

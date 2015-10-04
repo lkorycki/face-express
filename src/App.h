@@ -12,7 +12,7 @@ public:
     App();
     ~App();
     void runCam(int camId);
-    void runImage(string imgPath, bool toFile = false);
+    void runImage(string imgPath, bool toFile = false, string outDir = "", string outId = Logger::getTime());
     void captureSequence(int camId, int frames, int delay, bool features);
 
 private:
@@ -21,6 +21,7 @@ private:
 
     map<string, string> pathMap;
     void ensureDirectories(map<string, string> pathMap);
+    void ensureDirectory(string path);
 };
 
 #endif // APP_H
