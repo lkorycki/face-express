@@ -50,7 +50,7 @@ void App::runCam(int camId)
     }
 }
 
-void App::runImage(string imgPath, bool toFile, string outDir, string outId)
+void App::runImage(string imgPath, bool toFile, string subDir, string outId, bool seq)
 {
     Mat frame = imread(imgPath, CV_LOAD_IMAGE_COLOR);
     resize(frame, frame, Size(860, 640), 1.0, 1.0, INTER_CUBIC);
@@ -63,19 +63,24 @@ void App::runImage(string imgPath, bool toFile, string outDir, string outId)
     if(!faceFrame.empty()) log->show(featureVector);
     if(toFile)
     {
-        string dir = (outDir == "" ? pathMap["outputs"] : outDir);
-        log->writeToFile(featureVector, dir + "vec_" + outId);
-        imwrite(dir + "feat_" + outId + ".png", this->facialFeatures->faceFrameVis);
+        // Ensure directories
+        string outDir = pathMap["outputs"] + "/" + subDir + "/";
+        ensureDirectory(outDir, true);
+
+        // Write outputs
+        //imwrite(outDir + "in/" + outId + "_input_face" + ".png", this->facialFeatures->faceFrame);
+        log->writeToFile(featureVector, outDir + "out/" + outId + "_vec");
+        imwrite(outDir + "out/" + outId + "_feat" + ".png", this->facialFeatures->faceFrameVis);
     }
 
-    if(outDir == "")
+    if(!seq)
     {
         waitKey(100); // needed for event loop processing (highgui)
         cin.get();
     }
 }
 
-void App::captureSequence(int camId, int frames, int delay, bool features)
+void App::runSequence(int camId, int frames, int delay, bool features)
 {
     // Inits
     vector<Mat> seq;
@@ -94,20 +99,19 @@ void App::captureSequence(int camId, int frames, int delay, bool features)
     }
 
     // Write from array of mats
-    string dir = pathMap["outputs"] + log->getTime();
-    ensureDirectory(dir);
-    ensureDirectory(dir + "/in/");
-    if(features) ensureDirectory(dir + "/out/");
+    string subDir = log->getTime() + "/";
+    string dir = pathMap["outputs"] + subDir;
+    ensureDirectory(dir, true);
 
     for(int i = 0; i < seq.size(); i++)
     {
         stringstream ss; ss << i;
-        string path = dir + "/in/" + ss.str() + ".png";
+        string path = dir + "in/" + ss.str() + "_input" + ".png";
         cout << "Writing to: " << path << endl;
         imwrite(path, seq[i]);
 
         // Extract features if needed
-        if(features) runImage(path, true, dir + "/out/", ss.str());
+        if(features) runImage(path, true, subDir, ss.str(), true);
     }
 }
 
@@ -121,10 +125,18 @@ void App::ensureDirectories(map<string, string> pathMap)
     }
 }
 
-void App::ensureDirectory(string path)
+void App::ensureDirectory(string path, bool inout)
 {
     boost::filesystem::path dir(path);
-    boost::filesystem::create_directory(path);
+    boost::filesystem::create_directory(dir);
+
+    if(inout)
+    {
+        boost::filesystem::path dirIn(path + "/in/");
+        boost::filesystem::create_directory(dirIn);
+        boost::filesystem::path dirOut(path + "/out/");
+        boost::filesystem::create_directory(dirOut);
+    }
 }
 
 App::~App()

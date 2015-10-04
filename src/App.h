@@ -12,8 +12,8 @@ public:
     App();
     ~App();
     void runCam(int camId);
-    void runImage(string imgPath, bool toFile = false, string outDir = "", string outId = Logger::getTime());
-    void captureSequence(int camId, int frames, int delay, bool features);
+    void runImage(string imgPath, bool toFile = false, string subDir = Logger::getTime(), string outId = "", bool seq = false);
+    void runSequence(int camId, int frames, int delay, bool features);
 
 private:
     Logger* log;
@@ -21,7 +21,7 @@ private:
 
     map<string, string> pathMap;
     void ensureDirectories(map<string, string> pathMap);
-    void ensureDirectory(string path);
+    void ensureDirectory(string path, bool inout = false);
 };
 
 #endif // APP_H
