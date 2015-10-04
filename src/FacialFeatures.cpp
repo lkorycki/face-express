@@ -478,7 +478,11 @@ void FacialFeatures::collectFacialFeatures()
 
     // Normalization
     double nf = fp[9].x - fp[4].x; // normalization factor is |dx| between eye centers
-    for(int i = 0; i < FEAT_NUM-1; i++) fv[i] /= nf;
+    for(int i = 0; i < FEAT_NUM-1; i++)
+    {
+        fv[i] /= nf;
+        if(fv[i]  > 1.0) fv[i] = 1.0;
+    }
 }
 
 FacialFeatures::~FacialFeatures()
