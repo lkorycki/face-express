@@ -36,12 +36,6 @@ void ImageAnalyzer::findEyePoints(Mat& src, ROItype roi)
     for(int i = 0; i < 4; i++)  ff->featurePoints[i+off] = Point((points[(i+1)%4].x + points[i].x)/2, (points[(i+1)%4].y + points[i].y)/2);
     for(int i = 0; i < 5; i++) circle(ff->faceFrameVis, ff->featurePoints[i+off], 2, Scalar(0,255,0), CV_FILLED);
     ellipse(ff->faceFrameVis, elp, Scalar(255,255,0));
-
-    // Get eye features
-    //ff->featureVector[0] = elp_points[0]; // eye center
-    ff->featureVector[0] = elp.boundingRect().width; // eye width
-    ff->featureVector[1] = elp.boundingRect().height; // eye height
-    ff->featureVector[2] = elp.angle; // rotation angle
 }
 
 void ImageAnalyzer::findEyebrowPoints(Mat &src, ROItype roi)
