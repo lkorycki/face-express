@@ -32,7 +32,10 @@ void App::runCam(int camId)
     // Inits
     VideoCapture cap(camId); // open the default camera
     if(!cap.isOpened()) return; // check if we succeeded
+    string outDir = pathMap["outputs"] + "/" + Logger::getTime() + "/"; // for capturing
+    int n = 0;
 
+    char k;
     while(1)
     {
         Mat frame; cap >> frame;
@@ -45,8 +48,17 @@ void App::runCam(int camId)
 
         this->log->show(featureVector);
 
-        if(waitKey(1) >= 0) break;
-        // TODO: save mat and fv to file on click
+        k = waitKey(1);
+        if(k == ' ') // capture the actual result
+        {
+            ensureDirectory(outDir, true);
+            stringstream ss; ss << (n++); string id = ss.str();
+
+            imwrite(outDir + "in/" + id + "_input" + ".png", frame);
+            log->writeToFile(featureVector, outDir + "out/" + id + "_vec");
+            imwrite(outDir + "out/" + id + "_feat" + ".png", this->facialFeatures->faceFrameVis);
+        }
+        else if(k >= 0) break;
     }
 }
 
