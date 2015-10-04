@@ -46,7 +46,8 @@ double* FacialFeatures::extractFacialFeatures(Mat& src)
     if(src.empty()) // no face detected
     {
         imshow("FaceFeature", NULL);
-        return NULL;
+        for(int i = 0; i < FEAT_NUM; i++) this->featureVector[i] = -1;
+        return this->featureVector;
     }
     this->faceFrame = src.clone();
     this->faceFrameVis = src.clone();
@@ -477,7 +478,7 @@ void FacialFeatures::collectFacialFeatures()
 
     // Normalization
     double nf = fp[9].x - fp[4].x; // normalization factor is |dx| between eye centers
-    for(int i = 0; i < 15; i++) fv[i] /= nf;
+    for(int i = 0; i < FEAT_NUM-1; i++) fv[i] /= nf;
 }
 
 FacialFeatures::~FacialFeatures()
