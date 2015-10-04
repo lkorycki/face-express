@@ -12,8 +12,7 @@ public:
     App();
     ~App();
     void runCam(int camId);
-    void runImage(string imgPath, bool toFile = false, string subDir = Logger::getTime(), string outId = "", bool seq = false);
-    void runSequence(int camId, int frames, int delay, bool features);
+    void runImage(string imgPath, bool toFile = false, string subDir = Logger::getTime(), string outId = "");
 
 private:
     Logger* log;

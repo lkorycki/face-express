@@ -62,7 +62,7 @@ void App::runCam(int camId)
     }
 }
 
-void App::runImage(string imgPath, bool toFile, string subDir, string outId, bool seq)
+void App::runImage(string imgPath, bool toFile, string subDir, string outId)
 {
     Mat frame = imread(imgPath, CV_LOAD_IMAGE_COLOR);
     resize(frame, frame, Size(860, 640), 1.0, 1.0, INTER_CUBIC);
@@ -85,46 +85,8 @@ void App::runImage(string imgPath, bool toFile, string subDir, string outId, boo
         imwrite(outDir + "out/" + outId + "_feat" + ".png", this->facialFeatures->faceFrameVis);
     }
 
-    if(!seq)
-    {
-        waitKey(100); // needed for event loop processing (highgui)
-        cin.get();
-    }
-}
-
-void App::runSequence(int camId, int frames, int delay, bool features)
-{
-    // Inits
-    vector<Mat> seq;
-    VideoCapture cap(camId); // open the default camera
-    if(!cap.isOpened()) return; // check if we succeeded
-
-    // Capture
-    for(int i = 0; i < frames; i++)
-    {
-        Mat frame; cap >> frame;
-        resize(frame, frame, Size(860, 640), 1.0, 1.0, INTER_CUBIC);
-        imshow("FaceDet", frame);
-        seq.push_back(frame);
-
-        if(waitKey(delay) >= 0) break;
-    }
-
-    // Write from array of mats
-    string subDir = log->getTime() + "/";
-    string dir = pathMap["outputs"] + subDir;
-    ensureDirectory(dir, true);
-
-    for(int i = 0; i < seq.size(); i++)
-    {
-        stringstream ss; ss << i;
-        string path = dir + "in/" + ss.str() + "_input" + ".png";
-        cout << "Writing to: " << path << endl;
-        imwrite(path, seq[i]);
-
-        // Extract features if needed
-        if(features) runImage(path, true, subDir, ss.str(), true);
-    }
+    waitKey(100); // needed for event loop processing (highgui)
+    cin.get();
 }
 
 void App::ensureDirectories(map<string, string> pathMap)
