@@ -8,10 +8,10 @@ App::App()
     namedWindow("FaceFeature", WINDOW_NORMAL);
     moveWindow("FaceFeature", 300,0);
 
-//    namedWindow("work1", WINDOW_NORMAL);
-//    moveWindow("work1", 0,300);
-//    namedWindow("work2", WINDOW_NORMAL);
-//    moveWindow("work2", 300,300);
+    namedWindow("work1", WINDOW_NORMAL);
+    moveWindow("work1", 0,300);
+    namedWindow("work2", WINDOW_NORMAL);
+    moveWindow("work2", 300,300);
 //    namedWindow("work3", WINDOW_NORMAL);
 //    moveWindow("work3", 600,300);
 //    namedWindow("work4", WINDOW_NORMAL);

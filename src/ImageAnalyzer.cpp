@@ -149,7 +149,7 @@ void ImageAnalyzer::findBestContour(Mat& src, vector<Point>& contour, Point offs
     {
         double area = contourArea(contours[i]);
         if(!eye && area < maxArea) continue;
-        else if(eye && (area < maxArea || boundingRect(contours[i]).width > 0.7*src.cols)) continue; // to distinguish eyebrows
+        else if(eye && (area < maxArea || boundingRect(contours[i]).width > 0.65*src.cols)) continue; // to distinguish eyebrows
         else
         {
             idx = i;
