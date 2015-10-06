@@ -33,7 +33,7 @@ void ImageAnalyzer::findEyePoints(Mat& src, ROItype roi)
     if(roi == L_EYE) ff->featurePoints[4] = elp.center;
     else if(roi == R_EYE) ff->featurePoints[9] = elp.center;
 
-    for(int i = 0; i < 4; i++)  ff->featurePoints[i+off] = Point((points[(i+1)%4].x + points[i].x)/2, (points[(i+1)%4].y + points[i].y)/2);
+    for(int i = 0; i < 4; i++) ff->featurePoints[i+off] = Point((points[(i+1)%4].x + points[i].x)/2, (points[(i+1)%4].y + points[i].y)/2);
     for(int i = 0; i < 5; i++) circle(ff->faceFrameVis, ff->featurePoints[i+off], 2, Scalar(0,255,0), CV_FILLED);
     ellipse(ff->faceFrameVis, elp, Scalar(255,255,0));
 }

@@ -8,7 +8,7 @@ FacialFeatures::FacialFeatures()
    // ROI and contours
    for(int i = 0; i < ROI_NUM; i++)  this->ROI[i] = Mat();
    for(int i = 0; i < OFF_NUM; i++) this->roiOffsets[i] = Point(0,0); // offsets
-   this->featureContours = new vector<Point>[6]; // todo
+   this->featureContours = new vector<Point>[6];
 
     // Feature vectors
    this->featurePoints = new Point[FEAT_POINTS];
@@ -17,12 +17,12 @@ FacialFeatures::FacialFeatures()
    for(int i = 0; i < FEAT_NUM; i++) this->featureVector[i] = -1;
 
    // Their offsets
-   this->featPointOffsets[L_EYE] = 0; this->featVecOffsets[L_EYE] = 0;
-   this->featPointOffsets[R_EYE] = 5; this->featVecOffsets[R_EYE] = 0;
-   this->featPointOffsets[L_EB] = 10; this->featVecOffsets[L_EB] = 0;
-   this->featPointOffsets[R_EB] = 13; this->featVecOffsets[R_EB] = 0;
-   this->featPointOffsets[MOUTH] = 16; this->featVecOffsets[MOUTH] = 0;
-   this->featPointOffsets[NOSE] = 20; this->featVecOffsets[NOSE] = 0;
+   this->featPointOffsets[L_EYE] = 0;
+   this->featPointOffsets[R_EYE] = 5;
+   this->featPointOffsets[L_EB] = 10;
+   this->featPointOffsets[R_EB] = 13;
+   this->featPointOffsets[MOUTH] = 16;
+   this->featPointOffsets[NOSE] = 20;
 
    ImageAnalyzer::setFF(this);
    ImageProcessor::setFF(this);

@@ -29,7 +29,6 @@ private:
     Point* featurePoints;
     double* featureVector;
     int featPointOffsets[OFF_NUM];
-    int featVecOffsets[OFF_NUM];
 
     void extractEyesPoints();
     void extractEyebrowsPoints();
