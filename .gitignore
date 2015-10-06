@@ -1,4 +1,4 @@
 *.pro*
 /build
 /src/*.autosave
-.gitignore~
+*~
