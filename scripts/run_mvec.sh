@@ -1,0 +1,16 @@
+#!/bin/bash 
+echo "#neutral"
+./mvec ./$1/01_neutral vec "neutral"
+echo "#happy"
+./mvec ./$1/02_happy vec "happy"
+echo "#surprise"
+./mvec ./$1/03_surprise vec "surprise"
+echo "#anger"
+./mvec ./$1/04_anger vec "anger"
+echo "#sad"
+./mvec ./$1/05_sad vec "sad"
+echo "#disgust"
+./mvec ./$1/06_disgust vec "disgust"
+echo "#fear"
+./mvec ./$1/07_fear vec "fear"
+
