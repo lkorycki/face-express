@@ -17,6 +17,7 @@ public:
 private:
     Logger* log;
     FacialFeatures* facialFeatures;
+    //IntelliCore* intelliCore;
 
     map<string, string> pathMap;
     void ensureDirectories(map<string, string> pathMap);
