@@ -11,7 +11,7 @@ void ImageAnalyzer::setFF(FacialFeatures *ff)
     ImageAnalyzer::ff = ff;
 }
 
-void ImageAnalyzer::findEyePoints(Mat& src, ROItype roi)
+void ImageAnalyzer::findEyePoints(Mat& src, ROIType roi)
 {
     // Find eye contour
     vector<Point> contour;
@@ -38,7 +38,7 @@ void ImageAnalyzer::findEyePoints(Mat& src, ROItype roi)
     ellipse(ff->faceFrameVis, elp, Scalar(255,255,0));
 }
 
-void ImageAnalyzer::findEyebrowPoints(Mat &src, ROItype roi)
+void ImageAnalyzer::findEyebrowPoints(Mat &src, ROIType roi)
 {
     // Find eyebrow contour
     vector<Point> contour;
@@ -135,7 +135,7 @@ void ImageAnalyzer::findMouthPoints(Mat& src)
     //imshow("Right", rightROI);
 }
 
-void ImageAnalyzer::findBestContour(Mat& src, vector<Point>& contour, Point offset, ROItype roi)
+void ImageAnalyzer::findBestContour(Mat& src, vector<Point>& contour, Point offset, ROIType roi)
 {
     // Find the biggest contour
     vector< vector<Point> > contours;

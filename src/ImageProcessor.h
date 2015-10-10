@@ -29,7 +29,7 @@ public:
     static void binarizeTeeth(Mat& src, Mat& dst, int t);
 
     static void preprocessEyeROI(Mat& src, Mat& dst);
-    static void preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi);
+    static void preprocessEyebrowROI(Mat& src, Mat& dst, ROIType roi);
     static void preprocessMouthROI(Mat& src, Mat& dst);
 
 private:

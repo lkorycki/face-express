@@ -271,7 +271,7 @@ void ImageProcessor::preprocessEyeROI(Mat& src, Mat& dst)
     binarizeEye(dst, dst);
 }
 
-void ImageProcessor::preprocessEyebrowROI(Mat& src, Mat& dst, ROItype roi)
+void ImageProcessor::preprocessEyebrowROI(Mat& src, Mat& dst, ROIType roi)
 {
     // Grayscale contrast
     cvtColor(src, dst, CV_BGR2GRAY);

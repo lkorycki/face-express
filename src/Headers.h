@@ -19,6 +19,7 @@ using namespace cv;
 #include <fann_cpp.h>
 using namespace FANN;
 
-enum ROItype { L_EYE, R_EYE, L_EB, R_EB, MOUTH, NOSE, TEETH, FACE, NONE };
+enum ROIType { L_EYE, R_EYE, L_EB, R_EB, MOUTH, NOSE, TEETH, FACE, NONE };
+enum EmotionType { NEUTRAL, HAPPY, SURPRISE, ANGER, SAD, DISGUST, FEAR };
 
 #endif // HEADERS_H
