@@ -2,6 +2,7 @@
 #define LOGGER_H
 
 #include "Headers.h"
+#include "IntelliCore.h"
 
 class Logger
 {
@@ -11,8 +12,9 @@ public:
     ~Logger();
     void show(const double* fv);
     void showHeader();
-    void showFeatureVector(const double* fv);
+    void showFeatureVector(const double* fv);   
     void writeToFile(const double* fv, string path);
+    void showEmotionRecognition(float* ev);
     static string getTime();
 
 private:

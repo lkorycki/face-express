@@ -70,6 +70,42 @@ void Logger::writeToFile(const double* fv, string path)
     out.close();
 }
 
+void Logger::showEmotionRecognition(float* ev)
+{
+    // Find recognized emotion
+    int maxIdx = 0; float maxVal = ev[0];
+    for(int i = 1; i < EMOTION_NUM; i++)
+    {
+        if(ev[i] > maxVal)
+        {
+            maxVal = ev[i];
+            maxIdx = i;
+        }
+    }
+
+    cout.setf(ios::fixed); cout << setprecision(2);
+    cout << "Emotion recognition:\n\n";
+    for(int i = 0; i < EMOTION_NUM; i++)
+    {
+        int supp = ev[i]*10;
+        if(supp > 10) supp = 10;
+        else if(supp < 0) supp = 0;
+
+        if(i == maxIdx) cout << "\033[33;1m";
+        else cout << "\033[39;0m";
+
+        cout << setw(10) << left << IntelliCore::emotionTab[i] << ":";
+        cout << " (" << ev[i] << ") ";
+        for(int j = 0; j < supp; j++) cout << "+";
+
+        cout << endl;
+    }
+
+    cout << setprecision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout << endl;
+}
+
 string Logger::getTime()
 {
     time_t     now = time(0);

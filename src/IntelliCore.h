@@ -1,6 +1,8 @@
 #ifndef INTELLICORE_H
 #define INTELLICORE_H
 
+#define EMOTION_NUM 7
+
 #include "Headers.h"
 #include "Logger.h"
 class App;
@@ -11,6 +13,7 @@ class IntelliCore
 public:
     IntelliCore();
     ~IntelliCore();
+    static string emotionTab[EMOTION_NUM];
 
     void createNN(int inputNum, int hiddenNum, int outputNum);
     void trainNN(string dataPath, int maxEpoch, float desiredError, float learningRate, float momentum, bool save);

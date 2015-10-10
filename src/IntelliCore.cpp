@@ -1,6 +1,8 @@
 #include "IntelliCore.h"
 #include "App.h"
 
+string IntelliCore::emotionTab[EMOTION_NUM] = {"neutral", "happy", "surpris", "anger", "sad", "disgust", "fear" };
+
 IntelliCore::IntelliCore()
 {
     this->neuralNet = new neural_net();
