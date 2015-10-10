@@ -3,6 +3,7 @@
 
 #include "Headers.h"
 #include "FacialFeatures.h"
+#include "IntelliCore.h"
 #include "Logger.h"
 
 class App
@@ -13,16 +14,15 @@ public:
     ~App();
     void runCam(int camId);
     void runImage(string imgPath, bool toFile = false, string subDir = Logger::getTime(), string outId = "");
+    static map<string, string> pathMap;
 
 private:
     Logger* log;
     FacialFeatures* facialFeatures;
-    //IntelliCore* intelliCore;
+    IntelliCore* intelliCore;
 
-    map<string, string> pathMap;
     void ensureDirectories(map<string, string> pathMap);
     void ensureDirectory(string path, bool inout = false);
-
 };
 
 #endif // APP_H

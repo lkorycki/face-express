@@ -1,5 +1,7 @@
 #include "App.h"
 
+map<string, string> App::pathMap = map<string, string>();
+
 App::App()
 {
     // Init windows
@@ -24,6 +26,7 @@ App::App()
     // App paths
     pathMap["app"] = "/tmp/face-express/";
     pathMap["outputs"] = pathMap["app"] + "outputs/";
+    pathMap["nn_models"] = pathMap["app"] + "nn_models/";
     ensureDirectories(pathMap);
 }
 
@@ -117,4 +120,5 @@ App::~App()
 {
     delete log;
     delete facialFeatures;
+    delete intelliCore;
 }

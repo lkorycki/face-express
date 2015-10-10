@@ -2,14 +2,23 @@
 #define INTELLICORE_H
 
 #include "Headers.h"
+#include "Logger.h"
+class App;
 
 class IntelliCore
 {
 
 public:
     IntelliCore();
-    void loadCSV(string path, Mat& input, Mat& target, int N, int X);
     ~IntelliCore();
+
+    void createNN(int inputNum, int hiddenNum, int outputNum);
+    void trainNN(string dataPath, int maxEpoch, float desiredError, float learningRate, float momentum, bool save);
+    void testNN(string testPath);
+    void loadNN(string nnPath);
+
+private:
+    neural_net* neuralNet;
 
 };
 
