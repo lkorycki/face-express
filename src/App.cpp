@@ -10,10 +10,10 @@ App::App()
     namedWindow("FaceFeature", WINDOW_NORMAL);
     moveWindow("FaceFeature", 300,0);
 
-    namedWindow("work1", WINDOW_NORMAL);
-    moveWindow("work1", 0,300);
-    namedWindow("work2", WINDOW_NORMAL);
-    moveWindow("work2", 300,300);
+//    namedWindow("work1", WINDOW_NORMAL);
+//    moveWindow("work1", 0,300);
+//    namedWindow("work2", WINDOW_NORMAL);
+//    moveWindow("work2", 300,300);
 //    namedWindow("work3", WINDOW_NORMAL);
 //    moveWindow("work3", 600,300);
 //    namedWindow("work4", WINDOW_NORMAL);
@@ -22,6 +22,7 @@ App::App()
     // Main inits
     this->log = new Logger();
     this->facialFeatures = new FacialFeatures();
+    this->intelliCore = new IntelliCore("/home/lukas/Projects/PD/stat_models/nn_model_double");
 
     // App paths
     pathMap["app"] = "/tmp/face-express/";
@@ -45,11 +46,14 @@ void App::runCam(int camId)
         resize(frame, frame, Size(860, 640), 1.0, 1.0, INTER_CUBIC);
         //imshow("Video", frame);
 
+        // Process the image
         Mat faceFrame = Mat();
         this->facialFeatures->detectFace(frame, faceFrame);
         double* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
+        double* emotionVector = this->intelliCore->runNN(featureVector);
 
-        this->log->show(featureVector);
+        // Show results
+        this->log->show(featureVector, emotionVector);
 
         k = waitKey(1);
         if(k == ' ') // capture the actual result
@@ -71,11 +75,15 @@ void App::runImage(string imgPath, bool toFile, string subDir, string outId)
     resize(frame, frame, Size(860, 640), 1.0, 1.0, INTER_CUBIC);
     //imshow("FaceDet", frame);
 
+    // Process the image
     Mat faceFrame = Mat();
     this->facialFeatures->detectFace(frame, faceFrame);
     double* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
+    double* emotionVector = this->intelliCore->runNN(featureVector);
 
-    if(!faceFrame.empty()) log->show(featureVector);
+    // Show results
+    if(!faceFrame.empty()) log->show(featureVector, emotionVector);
+
     if(toFile)
     {
         // Ensure directories

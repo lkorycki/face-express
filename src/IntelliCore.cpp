@@ -1,11 +1,17 @@
 #include "IntelliCore.h"
 #include "App.h"
 
-string IntelliCore::emotionTab[EMOTION_NUM] = {"neutral", "happy", "surpris", "anger", "sad", "disgust", "fear" };
+string IntelliCore::emotionTab[EMOTION_NUM] = {"neutral", "happy", "surprise", "anger", "sad", "disgust", "fear" };
 
 IntelliCore::IntelliCore()
 {
     this->neuralNet = new neural_net();
+}
+
+IntelliCore::IntelliCore(string nnPath)
+{
+    this->neuralNet = new neural_net();
+    loadNN(nnPath);
 }
 
 void IntelliCore::createNN(int inputNum, int hiddenNum, int outputNum)
@@ -44,6 +50,7 @@ void IntelliCore::testNN(string testPath)
     for (int i = 0; i < testData.length_train_data(); ++i)
     {
         fann_type *calc_out = this->neuralNet->run(testData.get_input()[i]);
+
         stringstream ss; ss << i;
         cout << "[" + ss.str() + "]:";
         cout << "\tTarget: "; for(int j = 0; j < 7; j++) cout << testData.get_output()[i][j] << " ";
@@ -62,6 +69,11 @@ void IntelliCore::loadNN(string nnPath)
 {
     cout << "Loading neural net model from the file: " << nnPath << endl;
     this->neuralNet->create_from_file(nnPath);
+}
+
+double* IntelliCore::runNN(double* input)
+{
+    return this->neuralNet->run(input);
 }
 
 IntelliCore::~IntelliCore()

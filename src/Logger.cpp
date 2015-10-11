@@ -4,11 +4,12 @@ Logger::Logger()
 {
 }
 
-void Logger::show(const double* fv)
+void Logger::show(const double* fv, const double* ev)
 {
     cls();
-    showHeader();
+    //showHeader();
     showFeatureVector(fv);
+    showEmotionRecognition(ev);
 }
 
 void Logger::showHeader()
@@ -70,10 +71,10 @@ void Logger::writeToFile(const double* fv, string path)
     out.close();
 }
 
-void Logger::showEmotionRecognition(float* ev)
+void Logger::showEmotionRecognition(const double* ev)
 {
     // Find recognized emotion
-    int maxIdx = 0; float maxVal = ev[0];
+    int maxIdx = 0; double maxVal = ev[0];
     for(int i = 1; i < EMOTION_NUM; i++)
     {
         if(ev[i] > maxVal)
@@ -121,4 +122,7 @@ string Logger::getTime()
 
 Logger::~Logger()
 {
+    cout << "\033[39;0m";
+    cout << setprecision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
 }

@@ -5,13 +5,13 @@
 
 #include "Headers.h"
 #include "Logger.h"
-class App;
 
 class IntelliCore
 {
 
 public:
     IntelliCore();
+    IntelliCore(string nnPath);
     ~IntelliCore();
     static string emotionTab[EMOTION_NUM];
 
@@ -19,6 +19,7 @@ public:
     void trainNN(string dataPath, int maxEpoch, float desiredError, float learningRate, float momentum, bool save);
     void testNN(string testPath);
     void loadNN(string nnPath);
+    double* runNN(double* input);
 
 private:
     neural_net* neuralNet;
