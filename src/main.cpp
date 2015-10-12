@@ -3,10 +3,15 @@
 
 int main(int argc, char *argv[])
 {
-    App app = App();
-    app.runCam(0);
+    //App app = App();
+    //app.runCam(0);
 
-    //IntelliCore ic = IntelliCore();
+    IntelliCore ic = IntelliCore();
+    Mat input;
+    Mat output;
+    ic.loadData("/home/lukas/Projects/PD/training_data/training_vectors/vec_fann.data", input, output);
+
+
     //ic->loadNN("/home/lukas/Projects/PD/stat_models/nn_model_double");
     //ic.createNN(16,7,7);
     //ic.trainNN("/home/lukas/Projects/PD/training_data/training_vectors/vec_fann.data", 1000, 0.01, 0.2, 0.05, true);

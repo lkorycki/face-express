@@ -76,6 +76,37 @@ double* IntelliCore::runNN(double* input)
     return this->neuralNet->run(input);
 }
 
+void IntelliCore::loadData(string path, Mat& input, Mat& target)
+{
+    FILE* file = fopen(path.c_str(), "r");
+    if(!file) { cout << "Cannot open the file: " << path << endl; return; }
+    double x;
+    int sampleNum, inputNum, outputNum;
+    fscanf(file, "%d %d %d", &sampleNum, &inputNum, &outputNum);
+
+    input = Mat(sampleNum, inputNum, CV_64F);
+    target = Mat(sampleNum, outputNum, CV_64F);
+
+    for(int row = 0; row < sampleNum; row++)
+    {
+        // Load input values
+        for(int col = 0; col < inputNum; col++)
+        {
+            fscanf(file, "%lf ", &x);
+            input.at<double>(row, col) = x;
+        }
+
+        // Load target values
+        for(int col = 0; col < outputNum; col++)
+        {
+            fscanf(file, "%lf ", &x);
+            target.at<double>(row, col) = x;
+        }
+    }
+
+    fclose(file);
+}
+
 IntelliCore::~IntelliCore()
 {
     delete this->neuralNet;
