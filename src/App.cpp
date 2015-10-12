@@ -19,16 +19,16 @@ App::App()
 //    namedWindow("work4", WINDOW_NORMAL);
 //    moveWindow("work4", 900,300);
 
-    // Main inits
-    this->log = new Logger();
-    this->facialFeatures = new FacialFeatures();
-    this->intelliCore = new IntelliCore("/home/lukas/Projects/PD/stat_models/nn_model_double");
-
     // App paths
     pathMap["app"] = "/tmp/face-express/";
     pathMap["outputs"] = pathMap["app"] + "outputs/";
-    pathMap["nn_models"] = pathMap["app"] + "nn_models/";
+    pathMap["models"] = pathMap["app"] + "models/";
     ensureDirectories(pathMap);
+
+    // Main inits
+    this->log = new Logger();
+    this->facialFeatures = new FacialFeatures();
+    this->intelliCore = new IntelliCore("/home/lukas/Projects/PD/models/nn_model_float", "/home/lukas/Projects/PD/models/svm_model");
 }
 
 void App::runCam(int camId)
@@ -49,11 +49,12 @@ void App::runCam(int camId)
         // Process the image
         Mat faceFrame = Mat();
         this->facialFeatures->detectFace(frame, faceFrame);
-        double* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
-        double* emotionVector = this->intelliCore->runNN(featureVector);
+        float* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
+        float* emotionVector = this->intelliCore->runNN(featureVector);
+        int emotionLabel = this->intelliCore->runSVM(featureVector);
 
         // Show results
-        this->log->show(featureVector, emotionVector);
+        this->log->show(featureVector, emotionVector, emotionLabel);
 
         k = waitKey(1);
         if(k == ' ') // capture the actual result
@@ -78,11 +79,12 @@ void App::runImage(string imgPath, bool toFile, string subDir, string outId)
     // Process the image
     Mat faceFrame = Mat();
     this->facialFeatures->detectFace(frame, faceFrame);
-    double* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
-    double* emotionVector = this->intelliCore->runNN(featureVector);
+    float* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
+    float* emotionVector = this->intelliCore->runNN(featureVector);
+    int emotionLabel = this->intelliCore->runSVM(featureVector);
 
     // Show results
-    if(!faceFrame.empty()) log->show(featureVector, emotionVector);
+    if(!faceFrame.empty()) log->show(featureVector, emotionVector, emotionLabel);
 
     if(toFile)
     {

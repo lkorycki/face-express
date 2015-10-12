@@ -6,12 +6,15 @@ string IntelliCore::emotionTab[EMOTION_NUM] = {"neutral", "happy", "surprise", "
 IntelliCore::IntelliCore()
 {
     this->neuralNet = new neural_net();
+    this->svm = SVM::create();
 }
 
-IntelliCore::IntelliCore(string nnPath)
+IntelliCore::IntelliCore(string nnPath, string svmPath)
 {
     this->neuralNet = new neural_net();
-    loadNN(nnPath);
+    this->svm = SVM::create();
+    if(nnPath != "") loadNN(nnPath);
+    if(svmPath != "") loadSVM(svmPath);
 }
 
 void IntelliCore::createNN(int inputNum, int hiddenNum, int outputNum)
@@ -33,7 +36,7 @@ void IntelliCore::trainNN(string dataPath, int maxEpoch, float desiredError, flo
     this->neuralNet->train_on_data(trainData, maxEpoch, 0.01*maxEpoch, desiredError);
     cout << endl;
     if(save) {;
-        string path = App::pathMap["nn_models"] + "nn_" + Logger::getTime();
+        string path = App::pathMap["models"] + "nn_" + Logger::getTime();
         cout << "Saving created neural net model: " << path << endl;
         this->neuralNet->save(path);
     }
@@ -71,7 +74,7 @@ void IntelliCore::loadNN(string nnPath)
     this->neuralNet->create_from_file(nnPath);
 }
 
-double* IntelliCore::runNN(double* input)
+float* IntelliCore::runNN(float* input)
 {
     return this->neuralNet->run(input);
 }
@@ -94,7 +97,7 @@ void IntelliCore::trainSVM(string dataPath, bool save)
     this->svm->train(input, ROW_SAMPLE, target);
     cout << endl;
     if(save) {;
-        string path = App::pathMap["class_models"] + "svm_" + Logger::getTime();
+        string path = App::pathMap["models"] + "svm_" + Logger::getTime();
         cout << "Saving created SVM model: " << path << endl;
         this->svm->save(path);
     }

@@ -13,7 +13,7 @@ FacialFeatures::FacialFeatures()
     // Feature vectors
    this->featurePoints = new Point[FEAT_POINTS];
    for(int i = 0; i < FEAT_POINTS; i++) this->featurePoints[i] = Point(0,0);
-   this->featureVector = new double[FEAT_NUM];
+   this->featureVector = new float[FEAT_NUM];
    for(int i = 0; i < FEAT_NUM; i++) this->featureVector[i] = -1;
 
    // Their offsets
@@ -44,7 +44,7 @@ void FacialFeatures::detectFace(Mat& src, Mat& dst)
     imshow("FaceDet", f);
 }
 
-double* FacialFeatures::extractFacialFeatures(Mat& src)
+float* FacialFeatures::extractFacialFeatures(Mat& src)
 {
     if(src.empty()) // no face detected
     {
@@ -222,7 +222,7 @@ void FacialFeatures::collectFacialFeatures()
 {
     // For better coding
     Point* fp = this->featurePoints;
-    double* fv = this->featureVector;
+    float* fv = this->featureVector;
 
     // Features parametrization
     fv[0] = fp[1].x - fp[3].x; // left eye width
@@ -246,7 +246,7 @@ void FacialFeatures::collectFacialFeatures()
     fv[15]; // teeth param (white pixels to black pixels)
 
     // Normalization
-    double nf = fp[9].x - fp[4].x; // normalization factor is |dx| between eye centers
+    float nf = fp[9].x - fp[4].x; // normalization factor is |dx| between eye centers
     for(int i = 0; i < FEAT_NUM-1; i++)
     {
         fv[i] /= nf;

@@ -10,11 +10,11 @@ class Logger
 public:
     Logger();
     ~Logger();
-    void show(const double* fv, const double* ev);
+    void show(const float* fv, const float* ev, int e);
     void showHeader();
-    void showFeatureVector(const double* fv);   
-    void writeToFile(const double* fv, string path);
-    void showEmotionRecognition(const double* ev);
+    void showFeatureVector(const float* fv);
+    void writeToFile(const float* fv, string path);
+    void showEmotionRecognition(const float* ev);
     static string getTime();
 
 private:

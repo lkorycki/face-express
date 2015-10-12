@@ -21,13 +21,13 @@ public:
     FacialFeatures();
     ~FacialFeatures();
     void detectFace(Mat& src, Mat& dst);
-    double* extractFacialFeatures(Mat& src);
+    float* extractFacialFeatures(Mat& src);
     void setROI(Mat& src);
 
 private:
     Mat ROI[ROI_NUM];
     Point* featurePoints;
-    double* featureVector;
+    float* featureVector;
     int featPointOffsets[OFF_NUM];
 
     void extractEyesPoints();

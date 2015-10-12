@@ -11,7 +11,7 @@ class IntelliCore
 
 public:
     IntelliCore();
-    IntelliCore(string nnPath);
+    IntelliCore(string nnPath, string svmPath);
     ~IntelliCore();
     static string emotionTab[EMOTION_NUM];
 
@@ -22,7 +22,7 @@ public:
     void trainNN(string dataPath, int maxEpoch, float desiredError, float learningRate, float momentum, bool save);
     void testNN(string testPath);
     void loadNN(string nnPath);
-    double* runNN(double* input);
+    float* runNN(float* input);
 
     // SVM
     void createSVM(int svmType, int kernelType, int gamma = 0);

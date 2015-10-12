@@ -16,7 +16,7 @@ using namespace std;
 using namespace cv;
 using namespace cv::ml;
 
-#include <doublefann.h>
+#include <floatfann.h>
 #include <fann_cpp.h>
 using namespace FANN;
 

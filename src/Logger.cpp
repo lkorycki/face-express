@@ -4,12 +4,13 @@ Logger::Logger()
 {
 }
 
-void Logger::show(const double* fv, const double* ev)
+void Logger::show(const float* fv, const float* ev, int e)
 {
     cls();
     //showHeader();
     showFeatureVector(fv);
     showEmotionRecognition(ev);
+    cout << "SVM: " << IntelliCore::emotionTab[e-1] << endl;
 }
 
 void Logger::showHeader()
@@ -21,7 +22,7 @@ void Logger::showHeader()
     cout << "...\n";
 }
 
-void Logger::showFeatureVector(const double* fv)
+void Logger::showFeatureVector(const float* fv)
 {
     cout << "---------- Feature vector ----------\n";
 
@@ -57,7 +58,7 @@ void Logger::cls()
     #endif
 }
 
-void Logger::writeToFile(const double* fv, string path)
+void Logger::writeToFile(const float* fv, string path)
 {
     ofstream out;
     out.open(path);
@@ -71,7 +72,7 @@ void Logger::writeToFile(const double* fv, string path)
     out.close();
 }
 
-void Logger::showEmotionRecognition(const double* ev)
+void Logger::showEmotionRecognition(const float* ev)
 {
     // Find recognized emotion
     int maxIdx = 0; double maxVal = ev[0];
