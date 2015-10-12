@@ -7,10 +7,12 @@ int main(int argc, char *argv[])
     //app.runCam(0);
 
     IntelliCore ic = IntelliCore();
-    Mat input;
-    Mat output;
-    ic.loadData("/home/lukas/Projects/PD/training_data/training_vectors/vec_fann.data", input, output);
-
+    ic.loadSVM("/home/lukas/Projects/PD/stat_models/svm_model");
+    //ic.createSVM(SVM::C_SVC, SVM::RBF, 10);
+    //ic.trainSVM("/home/lukas/Projects/PD/training_data/training_vectors/vec_svm.data", true);
+    ic.testSVM("/home/lukas/Projects/PD/training_data/test_vectors/vec_svm.data");
+    float in[] = {0.228814,0.169492,0.389831,0.177966,0.372881,0.322034,0.305085,0.364407,0.220339,0.313559,0.79661,0.313559,0.677966,0.525424,0.525424,0.0043315};
+    cout << "Run: " << IntelliCore::emotionTab[ic.runSVM(in)-1];
 
     //ic->loadNN("/home/lukas/Projects/PD/stat_models/nn_model_double");
     //ic.createNN(16,7,7);

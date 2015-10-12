@@ -14,7 +14,6 @@ public:
     IntelliCore(string nnPath);
     ~IntelliCore();
     static string emotionTab[EMOTION_NUM];
-    void loadData(string path, Mat& input, Mat& target);
 
     // run classifier ?
 
@@ -25,11 +24,17 @@ public:
     void loadNN(string nnPath);
     double* runNN(double* input);
 
-    // TODO: SVM
-
+    // SVM
+    void createSVM(int svmType, int kernelType, int gamma = 0);
+    void trainSVM(string dataPath, bool save);
+    void testSVM(string testPath);
+    void loadSVM(string svmPath);
+    void loadDataSVM(string path, Mat& input, Mat& target);
+    int runSVM(float* input);
 
 private:
     neural_net* neuralNet;
+    Ptr<SVM> svm;
 
 };
 

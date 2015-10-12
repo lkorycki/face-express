@@ -14,6 +14,7 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 #include <opencv2/ml/ml.hpp>
 using namespace cv;
+using namespace cv::ml;
 
 #include <doublefann.h>
 #include <fann_cpp.h>
