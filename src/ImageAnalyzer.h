@@ -12,7 +12,7 @@ public:
     ImageAnalyzer();
     ~ImageAnalyzer();
     static void setFF(FacialFeatures* ff);
-    static void findBestContour(Mat& src, vector<Point>& contour, Point offset, ROIType roi = NONE);
+    static void findBestContour(Mat& src, vector<Point>& contour, Point offset, ROIType roi = NONE_ROI);
     static void findBestObject(Mat& src, Rect& dstROI, string dataPath);
 
     static void findEyePoints(Mat& src, ROIType roi);

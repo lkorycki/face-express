@@ -15,7 +15,7 @@ public:
     ~IntelliCore();
     static string emotionTab[EMOTION_NUM];
 
-    // run classifier ?
+    float* runClassifier(float* input, ClassifierType cType);
 
     // Neural net
     void createNN(int inputNum, int hiddenNum, int outputNum);
@@ -30,11 +30,11 @@ public:
     void testSVM(string testPath);
     void loadSVM(string svmPath);
     void loadDataSVM(string path, Mat& input, Mat& target);
-    int runSVM(float* input);
+    float* runSVM(float* input);
 
 private:
     neural_net* neuralNet;
-    Ptr<SVM> svm;
+    Ptr<ml::SVM> svm;
 
 };
 

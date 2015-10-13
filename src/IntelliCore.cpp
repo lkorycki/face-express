@@ -126,7 +126,7 @@ void IntelliCore::testSVM(string testPath)
 void IntelliCore::loadSVM(string svmPath)
 {
     cout << "Loading SVM model from the file: " << svmPath << endl;
-    this->svm = Algorithm::load<SVM>(svmPath);
+    this->svm = Algorithm::load<ml::SVM>(svmPath);
 }
 
 void IntelliCore::loadDataSVM(string path, Mat& input, Mat& target)
@@ -160,9 +160,20 @@ void IntelliCore::loadDataSVM(string path, Mat& input, Mat& target)
     fclose(file);
 }
 
-int IntelliCore::runSVM(float* input)
+float* IntelliCore::runSVM(float* input)
 {
-    return this->svm->predict(Mat(1, FEAT_NUM, CV_32F, input));
+    return new float[1] { this->svm->predict(Mat(1, FEAT_NUM, CV_32F, input)) };
+}
+
+float* IntelliCore::runClassifier(float* input, ClassifierType cType)
+{
+    switch(cType)
+    {
+        case ClassifierType::NN:
+            return runNN(input); break;
+        case ClassifierType::SVM:
+            return runSVM(input); break;
+    }
 }
 
 IntelliCore::~IntelliCore()

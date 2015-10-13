@@ -51,10 +51,10 @@ void App::runCam(int camId)
         this->facialFeatures->detectFace(frame, faceFrame);
         float* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
         float* emotionVector = this->intelliCore->runNN(featureVector);
-        int emotionLabel = this->intelliCore->runSVM(featureVector);
+        float* emotionLabel = this->intelliCore->runSVM(featureVector);
 
         // Show results
-        this->log->show(featureVector, emotionVector, emotionLabel);
+        this->log->show(featureVector, emotionVector, (int)emotionLabel[0]);
 
         k = waitKey(1);
         if(k == ' ') // capture the actual result
@@ -81,10 +81,10 @@ void App::runImage(string imgPath, bool toFile, string subDir, string outId)
     this->facialFeatures->detectFace(frame, faceFrame);
     float* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
     float* emotionVector = this->intelliCore->runNN(featureVector);
-    int emotionLabel = this->intelliCore->runSVM(featureVector);
+    float* emotionLabel = this->intelliCore->runSVM(featureVector);
 
     // Show results
-    if(!faceFrame.empty()) log->show(featureVector, emotionVector, emotionLabel);
+    if(!faceFrame.empty()) log->show(featureVector, emotionVector, (int)emotionLabel[0]);
 
     if(toFile)
     {
