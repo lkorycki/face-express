@@ -28,7 +28,9 @@ App::App()
     // Main inits
     this->log = new Logger();
     this->facialFeatures = new FacialFeatures();
-    this->intelliCore = new IntelliCore("/home/lukas/Projects/PD/models/nn_model_float", "/home/lukas/Projects/PD/models/svm_model");
+    this->intelliCore = new IntelliCore("/home/lukas/Projects/PD/models/nn_model_float",
+                                        "/home/lukas/Projects/PD/models/svm_model",
+                                        "/home/lukas/Projects/PD/training_data/training_vectors/vec_svm.data");
 }
 
 void App::runCam(int camId)
@@ -50,11 +52,12 @@ void App::runCam(int camId)
         Mat faceFrame = Mat();
         this->facialFeatures->detectFace(frame, faceFrame);
         float* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
-        float* emotionVector = this->intelliCore->runNN(featureVector);
-        float* emotionLabel = this->intelliCore->runSVM(featureVector);
+        float* emotionVector = this->intelliCore->runClassifier(ClassifierType::NN, featureVector);
+        float emotionLabel[2] = { this->intelliCore->runClassifier(ClassifierType::SVM, featureVector)[0],
+                                  this->intelliCore->runClassifier(ClassifierType::KNN, featureVector)[0] };
 
         // Show results
-        this->log->show(featureVector, emotionVector, (int)emotionLabel[0]);
+        this->log->show(featureVector, emotionVector, (int)emotionLabel[0], (int)emotionLabel[1]);
 
         k = waitKey(1);
         if(k == ' ') // capture the actual result
@@ -80,11 +83,12 @@ void App::runImage(string imgPath, bool toFile, string subDir, string outId)
     Mat faceFrame = Mat();
     this->facialFeatures->detectFace(frame, faceFrame);
     float* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
-    float* emotionVector = this->intelliCore->runNN(featureVector);
-    float* emotionLabel = this->intelliCore->runSVM(featureVector);
+    float* emotionVector = this->intelliCore->runClassifier(ClassifierType::NN, featureVector);
+    float emotionLabel[2] = { this->intelliCore->runClassifier(ClassifierType::SVM, featureVector)[0],
+                              this->intelliCore->runClassifier(ClassifierType::KNN, featureVector)[0] };
 
     // Show results
-    if(!faceFrame.empty()) log->show(featureVector, emotionVector, (int)emotionLabel[0]);
+    if(!faceFrame.empty()) log->show(featureVector, emotionVector, (int)emotionLabel[0], (int)emotionLabel[1]);
 
     if(toFile)
     {

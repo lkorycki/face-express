@@ -22,6 +22,6 @@ using namespace FANN;
 
 enum ROIType { L_EYE, R_EYE, L_EB, R_EB, MOUTH, NOSE, TEETH, FACE, NONE_ROI };
 enum EmotionType { NEUTRAL, HAPPY, SURPRISE, ANGER, SAD, DISGUST, FEAR };
-enum ClassifierType { NN, SVM, BOTH };
+enum ClassifierType { NN, SVM, KNN };
 
 #endif // HEADERS_H

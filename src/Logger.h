@@ -10,7 +10,7 @@ class Logger
 public:
     Logger();
     ~Logger();
-    void show(const float* fv, const float* ev, int e);
+    void show(const float* fv, const float* ev, int e1, int e2);
     void showHeader();
     void showFeatureVector(const float* fv);
     void writeToFile(const float* fv, string path);

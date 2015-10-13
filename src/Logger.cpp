@@ -4,13 +4,14 @@ Logger::Logger()
 {
 }
 
-void Logger::show(const float* fv, const float* ev, int e)
+void Logger::show(const float* fv, const float* ev, int e1, int e2)
 {
     cls();
     //showHeader();
     showFeatureVector(fv);
     showEmotionRecognition(ev);
-    cout << "SVM: " << IntelliCore::emotionTab[e-1] << endl;
+    cout << "SVM: " << IntelliCore::emotionTab[e1-1] << endl;
+    cout << "k-NN: " << IntelliCore::emotionTab[e2-1] << endl;
 }
 
 void Logger::showHeader()

@@ -11,11 +11,11 @@ class IntelliCore
 
 public:
     IntelliCore();
-    IntelliCore(string nnPath, string svmPath);
+    IntelliCore(string nnPath, string svmPath, string knnDataPath);
     ~IntelliCore();
     static string emotionTab[EMOTION_NUM];
-
-    float* runClassifier(float* input, ClassifierType cType);
+    void loadDataCV(string path, Mat& input, Mat& target);
+    float* runClassifier(ClassifierType cType, float* input);
 
     // Neural net
     void createNN(int inputNum, int hiddenNum, int outputNum);
@@ -26,15 +26,18 @@ public:
 
     // SVM
     void createSVM(int svmType, int kernelType, int gamma = 0);
-    void trainSVM(string dataPath, bool save);
-    void testSVM(string testPath);
-    void loadSVM(string svmPath);
-    void loadDataSVM(string path, Mat& input, Mat& target);
-    float* runSVM(float* input);
+    void loadSVM(string modelPath);
+    void trainModel(StatModel* model, string dataPath, bool save);
+    void testModel(StatModel* model, string testPath);
+    float* runModel(StatModel* model, float* input);
+
+    // k-NN
+    void createKNN(string dataPath, int k);
 
 private:
     neural_net* neuralNet;
     Ptr<ml::SVM> svm;
+    Ptr<ml::KNearest> knn;
 
 };
 

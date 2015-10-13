@@ -9,12 +9,13 @@ IntelliCore::IntelliCore()
     this->svm = SVM::create();
 }
 
-IntelliCore::IntelliCore(string nnPath, string svmPath)
+IntelliCore::IntelliCore(string nnPath, string svmPath, string knnDataPath)
 {
     this->neuralNet = new neural_net();
     this->svm = SVM::create();
     if(nnPath != "") loadNN(nnPath);
     if(svmPath != "") loadSVM(svmPath);
+    if(knnDataPath != "") createKNN(knnDataPath, 5);
 }
 
 void IntelliCore::createNN(int inputNum, int hiddenNum, int outputNum)
@@ -87,31 +88,31 @@ void IntelliCore::createSVM(int svmType, int kernelType, int gamma)
     this->svm->setGamma(gamma);
 }
 
-void IntelliCore::trainSVM(string dataPath, bool save)
+void IntelliCore::trainModel(StatModel* model, string dataPath, bool save)
 {
     Mat input, target;
-    loadDataSVM(dataPath, input, target);
+    loadDataCV(dataPath, input, target);
     //Ptr<TrainData> data = TrainData::create(input, ROW_SAMPLE, target);
 
     cout << endl << "Training SVM..." << endl;
-    this->svm->train(input, ROW_SAMPLE, target);
+    model->train(input, ROW_SAMPLE, target);
     cout << endl;
     if(save) {;
         string path = App::pathMap["models"] + "svm_" + Logger::getTime();
         cout << "Saving created SVM model: " << path << endl;
-        this->svm->save(path);
+        model->save(path);
     }
 }
 
-void IntelliCore::testSVM(string testPath)
+void IntelliCore::testModel(StatModel* model, string testPath)
 {
     Mat input, target;
-    loadDataSVM(testPath, input, target);
+    loadDataCV(testPath, input, target);
 
-    cout << endl << "Testing SVM..." << endl;
+    cout << endl << "Testing model..." << endl;
     for (int i = 0; i < input.rows; i++)
     {
-        int out = this->svm->predict(input.row(i));
+        int out = model->predict(input.row(i));
 
         stringstream ss; ss << i;
         cout << "[" + ss.str() + "]:";
@@ -123,13 +124,13 @@ void IntelliCore::testSVM(string testPath)
     cout << endl;
 }
 
-void IntelliCore::loadSVM(string svmPath)
+void IntelliCore::loadSVM(string modelPath)
 {
-    cout << "Loading SVM model from the file: " << svmPath << endl;
-    this->svm = Algorithm::load<ml::SVM>(svmPath);
+    cout << "Loading SVM model from the file: " << modelPath << endl;
+    this->svm = Algorithm::load<ml::SVM>(modelPath);
 }
 
-void IntelliCore::loadDataSVM(string path, Mat& input, Mat& target)
+void IntelliCore::loadDataCV(string path, Mat& input, Mat& target)
 {
     FILE* file = fopen(path.c_str(), "r");
     if(!file) { cout << "Cannot open the file: " << path << endl; return; }
@@ -160,19 +161,31 @@ void IntelliCore::loadDataSVM(string path, Mat& input, Mat& target)
     fclose(file);
 }
 
-float* IntelliCore::runSVM(float* input)
+float* IntelliCore::runModel(StatModel* model, float* input)
 {
-    return new float[1] { this->svm->predict(Mat(1, FEAT_NUM, CV_32F, input)) };
+    return new float[1] { model->predict(Mat(1, FEAT_NUM, CV_32F, input)) };
 }
 
-float* IntelliCore::runClassifier(float* input, ClassifierType cType)
+void IntelliCore::createKNN(string dataPath, int k)
+{
+    this->knn = KNearest::create();
+    this->knn->setDefaultK(k);
+    this->knn->setIsClassifier(true);
+
+    cout << "Creating k-NN with data: " << dataPath << endl;
+    trainModel(this->knn, dataPath, false);
+}
+
+float* IntelliCore::runClassifier(ClassifierType cType, float* input)
 {
     switch(cType)
     {
         case ClassifierType::NN:
             return runNN(input); break;
         case ClassifierType::SVM:
-            return runSVM(input); break;
+            return runModel(this->svm, input); break;
+        case ClassifierType::KNN:
+            return runModel(this->knn, input); break;
     }
 }
 
