@@ -176,6 +176,26 @@ void IntelliCore::createKNN(string dataPath, int k)
     trainModel(this->knn, dataPath, false);
 }
 
+float* IntelliCore::runEnsemble(float* input)
+{
+    // Simple classifiers ensembling - majority voting
+    int votes[7] = { 0 };
+
+    float* nnResult = runNN(input);
+    int max = MathCore::maxPos(nnResult, EMOTION_NUM);
+
+    votes[max]++;
+    votes[(int)runModel(this->svm, input)[0]-1]++;
+    votes[(int)runModel(this->knn, input)[0]-1]++;
+
+    return new float[1] { MathCore::maxPos(votes, EMOTION_NUM)+1 };
+}
+
+void IntelliCore::testEnsemble(string testPath)
+{
+
+}
+
 float* IntelliCore::runClassifier(ClassifierType cType, float* input)
 {
     switch(cType)
@@ -186,6 +206,8 @@ float* IntelliCore::runClassifier(ClassifierType cType, float* input)
             return runModel(this->svm, input); break;
         case ClassifierType::KNN:
             return runModel(this->knn, input); break;
+        case ClassifierType::ENSEMBLE:
+            return runEnsemble(input); break;
     }
 }
 

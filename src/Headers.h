@@ -7,6 +7,7 @@
 #include <time.h>
 #include <iostream>
 #include <iomanip>
+#include <iterator>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 using namespace std;
@@ -22,6 +23,6 @@ using namespace FANN;
 
 enum ROIType { L_EYE, R_EYE, L_EB, R_EB, MOUTH, NOSE, TEETH, FACE, NONE_ROI };
 enum EmotionType { NEUTRAL, HAPPY, SURPRISE, ANGER, SAD, DISGUST, FEAR };
-enum ClassifierType { NN, SVM, KNN };
+enum ClassifierType { NN, SVM, KNN, ENSEMBLE };
 
 #endif // HEADERS_H

@@ -24,7 +24,7 @@ public:
     void loadNN(string nnPath);
     float* runNN(float* input);
 
-    // SVM
+    // SVM and StatModels (for OpenCV models, e.g. k-NN)
     void createSVM(int svmType, int kernelType, int gamma = 0);
     void loadSVM(string modelPath);
     void trainModel(StatModel* model, string dataPath, bool save);
@@ -33,6 +33,10 @@ public:
 
     // k-NN
     void createKNN(string dataPath, int k);
+
+    // Ensemble
+    float* runEnsemble(float* input);
+    void testEnsemble(string testPath);
 
 private:
     neural_net* neuralNet;

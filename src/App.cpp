@@ -53,11 +53,13 @@ void App::runCam(int camId)
         this->facialFeatures->detectFace(frame, faceFrame);
         float* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
         float* emotionVector = this->intelliCore->runClassifier(ClassifierType::NN, featureVector);
-        float emotionLabel[2] = { this->intelliCore->runClassifier(ClassifierType::SVM, featureVector)[0],
-                                  this->intelliCore->runClassifier(ClassifierType::KNN, featureVector)[0] };
+        float emotionLabel[3] = { this->intelliCore->runClassifier(ClassifierType::SVM, featureVector)[0],
+                                  this->intelliCore->runClassifier(ClassifierType::KNN, featureVector)[0],
+                                  this->intelliCore->runClassifier(ClassifierType::ENSEMBLE, featureVector)[0]};
 
         // Show results
-        this->log->show(featureVector, emotionVector, (int)emotionLabel[0], (int)emotionLabel[1]);
+        if(!faceFrame.empty()) log->show(featureVector, emotionVector, (int)emotionLabel[0],
+                                        (int)emotionLabel[1], (int)emotionLabel[2]);
 
         k = waitKey(1);
         if(k == ' ') // capture the actual result
@@ -84,11 +86,13 @@ void App::runImage(string imgPath, bool toFile, string subDir, string outId)
     this->facialFeatures->detectFace(frame, faceFrame);
     float* featureVector = this->facialFeatures->extractFacialFeatures(faceFrame);
     float* emotionVector = this->intelliCore->runClassifier(ClassifierType::NN, featureVector);
-    float emotionLabel[2] = { this->intelliCore->runClassifier(ClassifierType::SVM, featureVector)[0],
-                              this->intelliCore->runClassifier(ClassifierType::KNN, featureVector)[0] };
+    float emotionLabel[3] = { this->intelliCore->runClassifier(ClassifierType::SVM, featureVector)[0],
+                              this->intelliCore->runClassifier(ClassifierType::KNN, featureVector)[0],
+                              this->intelliCore->runClassifier(ClassifierType::ENSEMBLE, featureVector)[0]};
 
     // Show results
-    if(!faceFrame.empty()) log->show(featureVector, emotionVector, (int)emotionLabel[0], (int)emotionLabel[1]);
+    if(!faceFrame.empty()) log->show(featureVector, emotionVector, (int)emotionLabel[0],
+                                    (int)emotionLabel[1], (int)emotionLabel[2]);
 
     if(toFile)
     {
