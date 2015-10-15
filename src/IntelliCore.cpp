@@ -49,24 +49,34 @@ void IntelliCore::testNN(string testPath)
     testData.read_train_from_file(testPath);
     testData.shuffle_train_data();
 
-    cout << endl << "Testing network..." << endl;
+    Mat response = Mat::zeros(EMOTION_NUM, EMOTION_NUM+1, CV_32S);
+    int pos = 0;
+
+    cout << endl << "Testing neural network..." << endl;
     cout.setf(ios::fixed); cout << setprecision(3);
-    for (int i = 0; i < testData.length_train_data(); i++)
+    int sampleNum = testData.length_train_data();
+    for (int i = 0; i < sampleNum; i++)
     {
         fann_type *calc_out = this->neuralNet->run(testData.get_input()[i]);
 
-        stringstream ss; ss << i;
-        cout << "[" + ss.str() + "]:";
-        cout << "\tTarget: "; for(int j = 0; j < 7; j++) cout << testData.get_output()[i][j] << " ";
-        cout << endl;
-        cout << "\tOutput: "; for(int j = 0; j < 7; j++) cout << calc_out[j] << " ";
-        cout << endl;
+        int tar = MathCore::maxPos(testData.get_output()[i], EMOTION_NUM);
+        int out = MathCore::maxPos(calc_out, EMOTION_NUM);
+
+        response.at<int>(tar, out)++; // target in row, actual response in column
+        response.at<int>(tar, EMOTION_NUM)++; // sum of target samples
+        if(out == tar) pos++;
     }
     cout << setprecision(6);
     cout.unsetf(ios::fixed | ios::scientific);
 
+    cout << "Responses:\n" << response << "\n\n";
+    cout << "Accuracy: \n";
+    for(int i = 0; i < EMOTION_NUM; i++)
+        cout << "\t" << emotionTab[i] << " : " << 100*(float)response.at<int>(i,i) / response.at<int>(i,EMOTION_NUM) << "%\n";
+    cout << endl << "\tGENERAL: " << 100*(float)pos / sampleNum << "%\n";
+
     this->neuralNet->test_data(testData);
-    cout << "\n\nTest MSE: " << this->neuralNet->get_MSE() << endl;
+    cout << "\tMSE: " << this->neuralNet->get_MSE() << endl;
 }
 
 void IntelliCore::loadNN(string nnPath)
@@ -92,7 +102,6 @@ void IntelliCore::trainModel(StatModel* model, string dataPath, bool save)
 {
     Mat input, target;
     loadDataCV(dataPath, input, target);
-    //Ptr<TrainData> data = TrainData::create(input, ROW_SAMPLE, target);
 
     cout << endl << "Training SVM..." << endl;
     model->train(input, ROW_SAMPLE, target);
@@ -104,24 +113,33 @@ void IntelliCore::trainModel(StatModel* model, string dataPath, bool save)
     }
 }
 
-void IntelliCore::testModel(StatModel* model, string testPath)
+void IntelliCore::testModel(StatModel* model, string testPath, bool ensemble)
 {
-    Mat input, target;
+    Mat input, target, response = Mat::zeros(EMOTION_NUM, EMOTION_NUM+1, CV_32S);
     loadDataCV(testPath, input, target);
+    int pos = 0;
 
     cout << endl << "Testing model..." << endl;
+    cout << setprecision(3);
     for (int i = 0; i < input.rows; i++)
     {
-        int out = model->predict(input.row(i));
+        int out;
+        if(!ensemble) out = model->predict(input.row(i));
+        else out = (int)runEnsemble(input.ptr<float>(i))[0];
+        int tar = target.at<int>(i,0);
 
-        stringstream ss; ss << i;
-        cout << "[" + ss.str() + "]:";
-        cout << "\tTarget: " << target.at<int>(i,0);
-        cout << endl;
-        cout << "\tOut: " << out;
-        cout << endl;
+        response.at<int>(tar-1, out-1)++; // target in row, actual response in column
+        response.at<int>(tar-1, EMOTION_NUM)++; // sum of target samples
+        if(out == tar) pos++;
     }
     cout << endl;
+
+    cout << "Responses:\n" << response << "\n\n";
+    cout << "Accuracy: \n";
+    for(int i = 0; i < EMOTION_NUM; i++)
+        cout << "\t" << emotionTab[i] << " : " << 100*(float)response.at<int>(i,i) / response.at<int>(i,EMOTION_NUM) << "%\n";
+    cout << endl << "\tGENERAL: " << 100*(float)pos / input.rows << "%\n";
+    cout << setprecision(6);
 }
 
 void IntelliCore::loadSVM(string modelPath)
@@ -189,11 +207,6 @@ float* IntelliCore::runEnsemble(float* input)
     votes[(int)runModel(this->knn, input)[0]-1]++;
 
     return new float[1] { MathCore::maxPos(votes, EMOTION_NUM)+1 };
-}
-
-void IntelliCore::testEnsemble(string testPath)
-{
-
 }
 
 float* IntelliCore::runClassifier(ClassifierType cType, float* input)

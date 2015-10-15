@@ -24,11 +24,11 @@ public:
     void loadNN(string nnPath);
     float* runNN(float* input);
 
-    // SVM and StatModels (for OpenCV models, e.g. k-NN)
+    // SVM and StatModels (for OpenCV models, e.g. k-NN + ensemble)
     void createSVM(int svmType, int kernelType, int gamma = 0);
     void loadSVM(string modelPath);
     void trainModel(StatModel* model, string dataPath, bool save);
-    void testModel(StatModel* model, string testPath);
+    void testModel(StatModel* model, string testPath, bool ensemble = false);
     float* runModel(StatModel* model, float* input);
 
     // k-NN
@@ -36,9 +36,8 @@ public:
 
     // Ensemble
     float* runEnsemble(float* input);
-    void testEnsemble(string testPath);
 
-private:
+//private:
     neural_net* neuralNet;
     Ptr<ml::SVM> svm;
     Ptr<ml::KNearest> knn;
