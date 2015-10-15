@@ -1,6 +1,3 @@
-// [1] RCA: http://www.cse.unsw.edu.au/~tatjana/ICMLWS02/MLCV/Morales.pdf
-// [2] http://sibgrapi.sid.inpe.br/col/sid.inpe.br/sibgrapi/2010/09.08.18.08/doc/CameraReady_70662.pdf
-
 #include "FacialFeatures.h"
 
 FacialFeatures::FacialFeatures()
@@ -16,7 +13,7 @@ FacialFeatures::FacialFeatures()
    this->featureVector = new float[FEAT_NUM];
    for(int i = 0; i < FEAT_NUM; i++) this->featureVector[i] = -1;
 
-   // Their offsets
+   // Their offsets (see file: feature_desc)
    this->featPointOffsets[L_EYE] = 0;
    this->featPointOffsets[R_EYE] = 5;
    this->featPointOffsets[L_EB] = 10;
@@ -24,6 +21,11 @@ FacialFeatures::FacialFeatures()
    this->featPointOffsets[MOUTH] = 16;
    this->featPointOffsets[NOSE] = 20;
 
+   // ROI for processing and feature points visualization
+   this->faceFrame = Mat();
+   this->faceFrameVis = Mat();
+
+   // Support modules set and read the facial features arrays
    ImageAnalyzer::setFF(this);
    ImageProcessor::setFF(this);
 }
@@ -35,7 +37,7 @@ void FacialFeatures::detectFace(Mat& src, Mat& dst)
     Mat f = src.clone();
     ImageAnalyzer::findBestObject(src, faceROI, "../data/haarcascade_frontalface_alt2.xml");
 
-    if(faceROI.area() > 0)
+    if(faceROI.area() > 0) // found
     {
         ROI[FACE] = dst = src(faceROI);
         rectangle(f, faceROI, CV_RGB(0, 255, 0), 2);
@@ -52,11 +54,13 @@ float* FacialFeatures::extractFacialFeatures(Mat& src)
         for(int i = 0; i < FEAT_NUM; i++) this->featureVector[i] = -1;
         return this->featureVector;
     }
+
+    // Save ROI
     this->faceFrame = src.clone();
     this->faceFrameVis = src.clone();
 
     // Extract facial features points
-    setROI(src);
+    setROI(src); // set ROIs for analyzing
     extractEyesPoints();
     extractEyebrowsPoints();
     extractMouthPoints();
@@ -79,7 +83,7 @@ void FacialFeatures::setROI(Mat& src)
     //circle(this->faceFrameVis, Point(cx, cy), 1, Scalar(0,255,255), 3);
 
     // 1) Eyes ROI
-    float a = 0.35, b = 0.19; // based on [2] a = 0.4 b = 0.1666
+    float a = 0.35, b = 0.19; // based on [1] a = 0.4 b = 0.1666
     this->roiOffsets[L_EYE] = Point(cx-a*fw, cy-b*fh); this->roiOffsets[R_EYE] = Point(cx, cy-b*fh); // displaying offsets
     Rect leftEye = Rect(this->roiOffsets[L_EYE].x, this->roiOffsets[L_EYE].y, a*fw, b*fh);
     Rect rightEye = Rect(this->roiOffsets[R_EYE].x, this->roiOffsets[R_EYE].y, a*fw, b*fh);
@@ -90,8 +94,8 @@ void FacialFeatures::setROI(Mat& src)
     //rectangle(this->faceFrameVis, rightEye, CV_RGB(0, 0, 255), 1);
 
     // 2) Eyebrows ROI
-    a = 0.38, b = 0.22; // based on [2] a = 0.43 b = 0.2
-    int ncy = cy - b*fh/2;
+    a = 0.38, b = 0.22; // based on [1] a = 0.43 b = 0.2
+    int ncy = cy - 0.1*fh;
     this->roiOffsets[L_EB] = Point(cx-a*fw, ncy-b*fh); this->roiOffsets[R_EB] = Point(cx, ncy-b*fh); // displaying offset
     Rect leftEyeBrow = Rect(this->roiOffsets[L_EB].x, this->roiOffsets[L_EB].y, a*fw, b*fh);
     Rect rightEyeBrow = Rect(this->roiOffsets[R_EB].x, this->roiOffsets[R_EB].y, a*fw, b*fh);
@@ -102,9 +106,9 @@ void FacialFeatures::setROI(Mat& src)
     //rectangle(this->faceFrameVis, rightEyeBrow, CV_RGB(0, 200, 0), 1);
 
     // 3) Mouth ROI
-    a *= 0.75, b = 0.8;
-    this->roiOffsets[MOUTH] = Point(cx-a*fw, cy+0.1*fh);
-    Rect mouth = Rect(roiOffsets[MOUTH].x, roiOffsets[MOUTH].y, 2*a*fw, b*0.5*fh);
+    a *= 0.75, b = 0.1;
+    this->roiOffsets[MOUTH] = Point(cx-a*fw, cy+b*fh);
+    Rect mouth = Rect(roiOffsets[MOUTH].x, roiOffsets[MOUTH].y, 2*a*fw, 4*b*fh);
 
     ROI[MOUTH] = src(mouth);
     //rectangle(this->faceFrameVis, mouth, CV_RGB(255, 0, 0), 1);
@@ -172,17 +176,17 @@ void::FacialFeatures::extractTeethParam()
     if(this->featureContours[MOUTH].empty()) return; // no mouth detected
 
     // Get teeth ROI
-    int off = 16; // mouth rect
+    int off = 16; // detected mouth feature points -> dynamic teeth ROI
     Rect teethRect = Rect(this->featurePoints[off].x, this->featurePoints[off+1].y,
             this->featurePoints[off+2].x - this->featurePoints[off].x,
             this->featurePoints[off+3].y - this->featurePoints[off+1].y);
 
     if(teethRect.x + teethRect.width > this->faceFrame.cols
-            || teethRect.y + teethRect.height > this->faceFrame.rows ) return;
+            || teethRect.y + teethRect.height > this->faceFrame.rows ) return; // too big ROI
     ROI[TEETH] = this->faceFrame(teethRect);
 
     // Binarize
-    Mat teethBin;
+    Mat teethBin = Mat(ROI[TEETH].rows, ROI[TEETH].cols, CV_8U);;
     ImageProcessor::binarizeTeeth(ROI[TEETH], teethBin, 75);
 
     // Get teeth param
@@ -197,12 +201,12 @@ void::FacialFeatures::extractTeethParam()
 
 void::FacialFeatures::extractNosePoints()
 {
-    // Get nose ROI
+    // Get nose ROI with cascade classifier
     int off = this->featPointOffsets[NOSE];
     Rect noseROI;
     ImageAnalyzer::findBestObject(ROI[NOSE], noseROI, "../data/nose_cascade.xml");
 
-    if(!noseROI.area() && !this->featurePoints[off].x) return; // if not found
+    if(!noseROI.area() && !this->featurePoints[off].x) return; // have not been found yet
 
     noseROI.x = noseROI.x + this->roiOffsets[NOSE].x; noseROI.y = noseROI.y + this->roiOffsets[NOSE].y; // equivalent of finding contours
     //rectangle(this->faceFrameVis, noseROI, CV_RGB(0, 0, 255), 1);
@@ -220,7 +224,7 @@ void::FacialFeatures::extractNosePoints()
 
 void FacialFeatures::collectFacialFeatures()
 {
-    // For better coding
+    // Just for better coding
     Point* fp = this->featurePoints;
     float* fv = this->featureVector;
 
@@ -260,3 +264,6 @@ FacialFeatures::~FacialFeatures()
     delete[] this->featurePoints;
     delete[] this->featureVector;
 }
+
+// -----------------------------------------
+// [1] http://sibgrapi.sid.inpe.br/col/sid.inpe.br/sibgrapi/2010/09.08.18.08/doc/CameraReady_70662.pdf
