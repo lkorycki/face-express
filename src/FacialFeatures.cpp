@@ -186,7 +186,7 @@ void::FacialFeatures::extractTeethParam()
     ROI[TEETH] = this->faceFrame(teethRect);
 
     // Binarize
-    Mat teethBin = Mat(ROI[TEETH].rows, ROI[TEETH].cols, CV_8U);;
+    Mat teethBin = Mat(ROI[TEETH].rows, ROI[TEETH].cols, CV_8U);
     ImageProcessor::binarizeTeeth(ROI[TEETH], teethBin, 75);
 
     // Get teeth param
@@ -206,7 +206,7 @@ void::FacialFeatures::extractNosePoints()
     Rect noseROI;
     ImageAnalyzer::findBestObject(ROI[NOSE], noseROI, "../data/nose_cascade.xml");
 
-    if(!noseROI.area() && !this->featurePoints[off].x) return; // have not been found yet
+    if(!noseROI.area() && !this->featurePoints[off].x) return; // has not been found yet
 
     noseROI.x = noseROI.x + this->roiOffsets[NOSE].x; noseROI.y = noseROI.y + this->roiOffsets[NOSE].y; // equivalent of finding contours
     //rectangle(this->faceFrameVis, noseROI, CV_RGB(0, 0, 255), 1);
