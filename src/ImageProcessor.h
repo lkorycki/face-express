@@ -19,7 +19,6 @@ public:
     static void clearBinBorder(Mat& src, Mat& dst); // white to black
     static void clearGrayBorderV(Mat &src, Mat &dst, int lw, float lmax, int rw = 0, float rmax = 0);
     static void clearGrayBorderH(Mat &src, Mat &dst, int tw, float tmax, int bw = 0, float bmax = 0);
-    static void findCorners(vector<Point> contour, Point& p1, Point& p2, bool horizontal = true);
 
     // Specialized for each ROI
     static void createEyeMap(Mat& src, Mat& dst);

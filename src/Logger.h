@@ -14,7 +14,8 @@ public:
     void showHeader();
     void showFeatureVector(const float* fv);
     void writeToFile(const float* fv, string path);
-    void showEmotionRecognition(const float* ev);
+    void showEmotionSupport(const float* ev);
+    void showEmotionRecognition(const float* ev, int e1, int e2, int e3);
     static string getTime();
 
 private:

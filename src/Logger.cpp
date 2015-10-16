@@ -9,10 +9,7 @@ void Logger::show(const float* fv, const float* ev, int e1, int e2, int e3)
     cls();
     //showHeader();
     showFeatureVector(fv);
-    showEmotionRecognition(ev);
-    cout << "SVM: " << IntelliCore::emotionTab[e1-1] << endl;
-    cout << "k-NN: " << IntelliCore::emotionTab[e2-1] << endl;
-    cout << "Ensemble: " << IntelliCore::emotionTab[e3-1] << endl;
+    showEmotionRecognition(ev, e1, e2, e3);
 }
 
 void Logger::showHeader()
@@ -26,29 +23,27 @@ void Logger::showHeader()
 
 void Logger::showFeatureVector(const float* fv)
 {
-    cout << "---------- Feature vector ----------\n";
+    cout << "\033[39;1m" << "---------- Feature vector ----------\n" << "\033[39;0m";
 
-    cout << "LEFT EYE WIDTH: \t\t" << fv[0] << endl;
-    cout << "LEFT EYE HEIGHT: \t\t" << fv[1] << endl;
-    cout << "RIGHT EYE WIDTH: \t\t" << fv[2] << endl;
-    cout << "RIGHT EYE HEIGHT: \t\t" << fv[3] << endl;
+    cout << "LEFT EYE WIDTH \t\t\t: " << fv[0] << endl;
+    cout << "LEFT EYE HEIGHT \t\t: " << fv[1] << endl;
+    cout << "RIGHT EYE WIDTH \t\t: " << fv[2] << endl;
+    cout << "RIGHT EYE HEIGHT \t\t: " << fv[3] << endl;
 
-    cout << "(LEFT CENTER) EYE - EYEBROW: \t" << fv[4] << endl;
-    cout << "(LEFT OUTER) EYE - EYEBROW: \t" << fv[5] << endl;
-    cout << "(LEFT INNER) EYE - EYEBROW: \t" << fv[6] << endl;
-    cout << "(RIGHT CENTER) EYE - EYEBROW: \t" << fv[7] << endl;
-    cout << "(RIGHT OUTER) EYE - EYEBROW: \t" << fv[8] << endl;
-    cout << "(RIGHT INNER) EYE - EYEBROW: \t" << fv[9] << endl;
+    cout << "(LEFT CENTER) EYE - EYEBROW \t: " << fv[4] << endl;
+    cout << "(LEFT OUTER) EYE - EYEBROW \t: " << fv[5] << endl;
+    cout << "(LEFT INNER) EYE - EYEBROW \t: " << fv[6] << endl;
+    cout << "(RIGHT CENTER) EYE - EYEBROW \t: " << fv[7] << endl;
+    cout << "(RIGHT OUTER) EYE - EYEBROW \t: " << fv[8] << endl;
+    cout << "(RIGHT INNER) EYE - EYEBROW \t: " << fv[9] << endl;
 
-    cout << "MOUTH WIDTH: \t\t\t" << fv[10] << endl;
-    cout << "MOUTH HEIGHT: \t\t\t" << fv[11] << endl;
-    cout << "LOWER LIP - NOSE TIP: \t\t" << fv[12] << endl;
-    cout << "LEFT MOUTH CORNER - NOSE TIP: \t" << fv[13] << endl;
-    cout << "RIGHT MOUTH - NOSE TIP: \t" << fv[14] << endl;
+    cout << "MOUTH WIDTH \t\t\t: " << fv[10] << endl;
+    cout << "MOUTH HEIGHT \t\t\t: " << fv[11] << endl;
+    cout << "LOWER LIP - NOSE TIP \t\t: " << fv[12] << endl;
+    cout << "LEFT MOUTH CORNER - NOSE TIP \t: " << fv[13] << endl;
+    cout << "RIGHT MOUTH - NOSE TIP \t\t: " << fv[14] << endl;
 
-    cout << "TEETH W2B_PARAM: \t\t" << fv[15] << endl;
-
-    cout << "------------------------------------\n";
+    cout << "TEETH W2B_PARAM \t\t: " << fv[15] << endl;
 }
 
 void Logger::cls()
@@ -74,7 +69,7 @@ void Logger::writeToFile(const float* fv, string path)
     out.close();
 }
 
-void Logger::showEmotionRecognition(const float* ev)
+void Logger::showEmotionSupport(const float* ev)
 {
     // Find recognized emotion
     int maxIdx = 0; double maxVal = ev[0];
@@ -88,7 +83,6 @@ void Logger::showEmotionRecognition(const float* ev)
     }
 
     cout.setf(ios::fixed); cout << setprecision(2);
-    cout << "Emotion recognition:\n\n";
     for(int i = 0; i < EMOTION_NUM; i++)
     {
         int supp = ev[i]*10;
@@ -96,18 +90,27 @@ void Logger::showEmotionRecognition(const float* ev)
         else if(supp < 0) supp = 0;
 
         if(i == maxIdx) cout << "\033[33;1m";
-        else cout << "\033[39;0m";
 
-        cout << setw(10) << left << IntelliCore::emotionTab[i] << ":";
+        cout << "\t" << setw(10) << left << IntelliCore::emotionTab[i] << ":";
         cout << " (" << ev[i] << ") ";
         for(int j = 0; j < supp; j++) cout << "+";
 
+        cout << "\033[39;0m";
         cout << endl;
     }
 
     cout << setprecision(6);
     cout.unsetf(ios::fixed | ios::scientific);
     cout << endl;
+}
+
+void Logger::showEmotionRecognition(const float *ev, int e1, int e2, int e3)
+{
+    cout << "\033[39;1m" << "\n-------- Emotion recognition -------\n" << "\033[39;0m";
+    cout << "NN:\n"; showEmotionSupport(ev);
+    cout << "SVM\t : " << IntelliCore::emotionTab[e1-1] << endl;
+    cout << "k-NN\t : " << IntelliCore::emotionTab[e2-1] << endl;
+    cout << "\033[39;1m" << "Ensemble : " << IntelliCore::emotionTab[e3-1] << "\033[39;0m" << endl;
 }
 
 string Logger::getTime()

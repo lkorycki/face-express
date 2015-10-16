@@ -11,39 +11,16 @@ void ImageProcessor::setFF(FacialFeatures *ff)
     ImageProcessor::ff = ff;
 }
 
-void ImageProcessor::createEyeMap(Mat& src, Mat& dst)
+void ImageProcessor::negateMat(Mat& src, Mat& dst)
 {
     for(int i = 0; i < src.rows; i++)
     {
         for(int j = 0; j < src.cols; j++)
         {
-            // Enchance eye segment
-            Vec3b& pixel = src.at<Vec3b>(Point(j,i));
-            uchar r = pixel[2];
-            dst.at<uchar>(Point(j,i)) = exp((255-r)*(log(255.0)/255.0)); // based on [1]
+            uchar& pixel = src.at<uchar>(Point(j,i));
+            dst.at<uchar>(Point(j,i)) = 255-pixel;
         }
     }
-}
-
-void ImageProcessor::binarizeEye(Mat& src, Mat& dst)
-{
-    float avg = MathCore::avg2D(src, 0);
-    float dev = MathCore::stdDeviation2D(src, 0);
-
-    for(int i = 0; i < src.rows; i++)
-    {
-        for(int j = 0; j < src.cols; j++)
-        {
-            uchar& src_pixel = src.at<uchar>(Point(j,i));
-            uchar& dst_pixel = src.at<uchar>(Point(j,i));
-            if(src_pixel > (avg + 0.9*dev)) dst_pixel = 255; //based on [1]
-            else dst_pixel = 0;
-        }
-    }
-
-    // Post-processing
-    dilate(dst, dst, getStructuringElement( MORPH_RECT, Size(5,3))); // connect eye segments
-    ImageProcessor::clearBinBorder(dst, dst); // remove border pixels (eg. eyebrow)
 }
 
 void ImageProcessor::clearBinBorder(Mat& src, Mat& dst)
@@ -69,27 +46,6 @@ void ImageProcessor::clearBinBorder(Mat& src, Mat& dst)
             if(row[x] == 255) floodFill(dst, Point(x,y), Scalar(0));
         }
      }
-}
-
-void ImageProcessor::binarizeEyebrow(Mat& src, Mat& dst, float p, int ys)
-{
-    // Calculate thresh
-    int threshVal = MathCore::histThresh2D(src, p);
-    threshold(src, dst, threshVal, 255, THRESH_BINARY);
-
-    // Mask detected eye
-    if(ys <= -1) return;
-    for(int i = ys; i < dst.rows; i++)
-    {
-        for(int j = 0; j < dst.cols; j++)
-        {
-           dst.at<uchar>(Point(j,i)) = 255;
-        }
-    }
-
-    // Post-processing
-    medianBlur(dst, dst, 5);
-    negateMat(dst, dst);
 }
 
 void ImageProcessor::clearGrayBorderV(Mat &src, Mat &dst, int lw, float lmax, int rw, float rmax)
@@ -148,6 +104,64 @@ void ImageProcessor::clearGrayBorderH(Mat &src, Mat &dst, int tw, float tmax, in
     }
 }
 
+void ImageProcessor::createEyeMap(Mat& src, Mat& dst)
+{
+    for(int i = 0; i < src.rows; i++)
+    {
+        for(int j = 0; j < src.cols; j++)
+        {
+            // Enchance eye segment
+            Vec3b& pixel = src.at<Vec3b>(Point(j,i));
+            uchar r = pixel[2];
+            dst.at<uchar>(Point(j,i)) = exp((255-r)*(log(255.0)/255.0)); // based on [1]
+        }
+    }
+}
+
+void ImageProcessor::binarizeEye(Mat& src, Mat& dst)
+{
+    float avg = MathCore::avg2D(src, 0);
+    float dev = MathCore::stdDeviation2D(src, 0);
+
+    for(int i = 0; i < src.rows; i++)
+    {
+        for(int j = 0; j < src.cols; j++)
+        {
+            uchar& src_pixel = src.at<uchar>(Point(j,i));
+            uchar& dst_pixel = src.at<uchar>(Point(j,i));
+            if(src_pixel > (avg + 0.9*dev)) dst_pixel = 255; //based on [1]
+            else dst_pixel = 0;
+        }
+    }
+
+    // Post-processing
+    dilate(dst, dst, getStructuringElement( MORPH_RECT, Size(5,3))); // connect eye segments
+    ImageProcessor::clearBinBorder(dst, dst); // remove border pixels (eg. eyebrow)
+}
+
+void ImageProcessor::binarizeEyebrow(Mat& src, Mat& dst, float p, int ys)
+{
+    // Calculate thresh
+    int threshVal = MathCore::histThresh2D(src, p);
+    threshold(src, dst, threshVal, 255, THRESH_BINARY);
+
+    // Mask detected eye
+    if(ys <= -1) return;
+    for(int i = ys; i < dst.rows; i++)
+    {
+        for(int j = 0; j < dst.cols; j++)
+        {
+           dst.at<uchar>(Point(j,i)) = 255;
+        }
+    }
+
+    // Post-processing
+    medianBlur(dst, dst, 5);
+    negateMat(dst, dst);
+}
+
+
+
 void ImageProcessor::createMouthMap(Mat& src, Mat& dst)
 {
     for(int i = 0; i < src.rows; i++)
@@ -188,18 +202,6 @@ void ImageProcessor::binarizeTeeth(Mat& src, Mat& dst, int t)
 
     // Binarize
     threshold(gray, dst, t, 255, THRESH_BINARY_INV);
-}
-
-void ImageProcessor::negateMat(Mat& src, Mat& dst)
-{
-    for(int i = 0; i < src.rows; i++)
-    {
-        for(int j = 0; j < src.cols; j++)
-        {
-            uchar& pixel = src.at<uchar>(Point(j,i));
-            dst.at<uchar>(Point(j,i)) = 255-pixel;
-        }
-    }
 }
 
 void ImageProcessor::createMouthCornerMap(Mat& src, Mat& dst, float p)

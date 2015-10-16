@@ -89,7 +89,7 @@ float MathCore::wbParam2D(Mat& mat)
         }
     }
 
-    wp /= 255; // num of white pixels
+    wp /= 255; // num of white (255) pixels
     bp = mat.rows*mat.cols - wp;
 
     return (float)(wp/bp);
