@@ -17,9 +17,10 @@ void ImageProcessor::createEyeMap(Mat& src, Mat& dst)
     {
         for(int j = 0; j < src.cols; j++)
         {
+            // Enchance eye segment
             Vec3b& pixel = src.at<Vec3b>(Point(j,i));
             uchar r = pixel[2];
-            dst.at<uchar>(Point(j,i)) = exp((255-r)*(log(255.0)/255.0));
+            dst.at<uchar>(Point(j,i)) = exp((255-r)*(log(255.0)/255.0)); // based on [1]
         }
     }
 }
@@ -35,15 +36,14 @@ void ImageProcessor::binarizeEye(Mat& src, Mat& dst)
         {
             uchar& src_pixel = src.at<uchar>(Point(j,i));
             uchar& dst_pixel = src.at<uchar>(Point(j,i));
-            if(src_pixel > (avg + 0.9*dev)) dst_pixel = 255;
+            if(src_pixel > (avg + 0.9*dev)) dst_pixel = 255; //based on [1]
             else dst_pixel = 0;
         }
     }
 
-    dilate(dst, dst, getStructuringElement( MORPH_RECT, Size(5,3)));
-
-    // Clear border
-    ImageProcessor::clearBinBorder(dst, dst);
+    // Post-processing
+    dilate(dst, dst, getStructuringElement( MORPH_RECT, Size(5,3))); // connect eye segments
+    ImageProcessor::clearBinBorder(dst, dst); // remove border pixels (eg. eyebrow)
 }
 
 void ImageProcessor::clearBinBorder(Mat& src, Mat& dst)
@@ -87,7 +87,7 @@ void ImageProcessor::binarizeEyebrow(Mat& src, Mat& dst, float p, int ys)
         }
     }
 
-    // Post processing
+    // Post-processing
     medianBlur(dst, dst, 5);
     negateMat(dst, dst);
 }
@@ -102,7 +102,7 @@ void ImageProcessor::clearGrayBorderV(Mat &src, Mat &dst, int lw, float lmax, in
         for(int j = 0; j < src.rows; j++)
         {
             uchar& srcPixel = src.at<uchar>(Point(i,j));
-            int newVal = (-(lmax/lw)*i + lmax)*(255-srcPixel) + srcPixel;
+            int newVal = (-(lmax/lw)*i + lmax)*(255-srcPixel) + srcPixel; // brighten, eyebrows are darker
             if(newVal > 255) newVal = 255;
             dst.at<uchar>(Point(i,j)) = newVal;
         }
@@ -155,11 +155,12 @@ void ImageProcessor::createMouthMap(Mat& src, Mat& dst)
         for(int j = 0; j < src.cols; j++)
         {
             Vec3b& pixel = src.at<Vec3b>(Point(j,i));
-            float s1 = 255*2*atan((pixel[2]-pixel[1])/(float)pixel[2])/M_PI;
-            dst.at<uchar>(Point(j,i)) = s1 < 0 ? 255 : 255-s1;
+            float newVal = 255*2*atan((pixel[2]-pixel[1])/(float)pixel[2])/M_PI; // based on [2]
+            dst.at<uchar>(Point(j,i)) = newVal < 0 ? 255 : 255-newVal;
         }
     }
 
+    // Post-processing
     equalizeHist(dst, dst);
 }
 
@@ -169,9 +170,9 @@ void ImageProcessor::binarizeMouth(Mat& src, Mat& dst, float p)
     int threshVal = MathCore::histThresh2D(src, p);
     threshold(src, dst, threshVal, 255, THRESH_BINARY);
 
-    // Postprocess
+    // Post-processing
     //medianBlur(dst, dst,3); // ? (consider)
-    erode(dst,dst, getStructuringElement( MORPH_ELLIPSE, Size(3,3)));
+    erode(dst,dst, getStructuringElement( MORPH_ELLIPSE, Size(3,3))); // connect
     negateMat(dst,dst);
 }
 
@@ -179,24 +180,14 @@ void ImageProcessor::binarizeTeeth(Mat& src, Mat& dst, int t)
 {
     // Convert to grayscale
     Mat gray; cvtColor(src, gray, CV_BGR2GRAY);
-    Mat bin = Mat(gray.rows, gray.cols, CV_8U);
 
-    // Preprocess
-    /*
-    equalizeHist(gray, gray);
-    negateMat(gray, gray);
-    */
-
-    createMouthMap(src, gray); // ? (consider)
+    createMouthMap(src, gray);
     negateMat(gray, gray);
     clearGrayBorderH(gray, gray, 0.35*gray.rows, 0.9, 0.4*gray.rows, 1.0);
     clearGrayBorderV(gray, gray, 0.15*gray.cols, 0.8, 0.15*gray.cols, 0.8);
 
     // Binarize
-    threshold(gray, bin, t, 255, THRESH_BINARY);
-    negateMat(bin, bin);
-
-    dst = bin;
+    threshold(gray, dst, t, 255, THRESH_BINARY_INV);
 }
 
 void ImageProcessor::negateMat(Mat& src, Mat& dst)
@@ -211,55 +202,17 @@ void ImageProcessor::negateMat(Mat& src, Mat& dst)
     }
 }
 
-void ImageProcessor::findCorners(vector<Point> contour, Point& p1, Point& p2, bool horizontal)
-{
-    if(horizontal)
-    {
-        p1.x = INT_MAX; // left
-        p2.x = -1; // right
-
-        for(int i = 0; i < contour.size(); i++)
-        {
-            Point p = contour[i];
-
-            if(p.x < p1.x) p1 = p;
-            if(p.x > p2.x) p2 = p;
-        }
-    }
-    else // vertical
-    {
-        p1.y = INT_MAX; // top
-        p2.y = -1; // bot
-
-        for(int i = 0; i < contour.size(); i++)
-        {
-            Point p = contour[i];
-
-            if(p.y < p1.y) p1 = p;
-            if(p.y > p2.y) p2 = p;
-        }
-    }
-}
-
 void ImageProcessor::createMouthCornerMap(Mat& src, Mat& dst, float p)
 {
     Mat gray; cvtColor(src, gray, CV_BGR2GRAY);
-    Mat map = Mat(src.rows, src.cols, CV_8U);
 
-    for(int i = 0; i < gray.rows; i++)
-    {
-        for(int j = 0; j < gray.cols; j++)
-        {
-            uchar& pixel = gray.at<uchar>(Point(j,i));
-            map.at<uchar>(Point(j,i)) = pixel;
-        }
-    }
+    // Post-process gray map
+    equalizeHist(gray, gray);
+    ImageProcessor::clearGrayBorderH(gray, gray, 0, 0, 0.2*gray.rows, 0.8);
 
-    equalizeHist(map, map);
-    ImageProcessor::clearGrayBorderH(map, map, 0, 0, 0.2*map.rows, 0.8);
-    int thresh = MathCore::histThresh2D(map, p);
-    threshold(map, dst, thresh, 255, THRESH_BINARY);
-    negateMat(dst, dst);
+    // Binarize (bin map)
+    int thresh = MathCore::histThresh2D(gray, p);
+    threshold(gray, dst, thresh, 255, THRESH_BINARY_INV);
 }
 
 void ImageProcessor::preprocessEyeROI(Mat& src, Mat& dst)
@@ -314,4 +267,6 @@ ImageProcessor::~ImageProcessor()
     ImageProcessor::ff = NULL;
 }
 
-
+// -----------------------------------------
+// [1] http://sibgrapi.sid.inpe.br/col/sid.inpe.br/sibgrapi/2010/09.08.18.08/doc/CameraReady_70662.pdf
+// [2] http://www.joics.com/publishedpapers/2012_9_9_2505_2514.pdf
