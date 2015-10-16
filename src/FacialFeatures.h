@@ -20,9 +20,9 @@ friend class ImageAnalyzer;
 public:
     FacialFeatures();
     ~FacialFeatures();
-    void detectFace(Mat& src, Mat& dst);
-    float* extractFacialFeatures(Mat& src);
-    void setROI(Mat& src);
+    void detectFace(const Mat& src, Mat& dst);
+    float* extractFacialFeatures(const Mat& src);
+    void setROI(const Mat& src);
 
 private:
     Mat ROI[ROI_NUM];

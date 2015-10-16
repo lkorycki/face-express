@@ -41,7 +41,7 @@ void ImageAnalyzer::findCorners(vector<Point> contour, Point& p1, Point& p2, boo
     }
 }
 
-void ImageAnalyzer::findBestContour(Mat& src, vector<Point>& contour, Point offset, ROIType roi)
+void ImageAnalyzer::findBestContour(const Mat& src, vector<Point>& contour, Point offset, ROIType roi)
 {
     // Find the biggest contour
     vector< vector<Point> > contours;
@@ -70,7 +70,7 @@ void ImageAnalyzer::findBestContour(Mat& src, vector<Point>& contour, Point offs
     }
 }
 
-void ImageAnalyzer::findBestObject(Mat& src, Rect& dstROI, string dataPath)
+void ImageAnalyzer::findBestObject(const Mat& src, Rect& dstROI, string dataPath)
 {
     CascadeClassifier cascade = CascadeClassifier(dataPath); // init cascade classifier
     Mat gray;
@@ -98,7 +98,7 @@ void ImageAnalyzer::findBestObject(Mat& src, Rect& dstROI, string dataPath)
     if(maxArea != 0) dstROI = bestROI;
 }
 
-void ImageAnalyzer::findEyePoints(Mat& src, ROIType roi)
+void ImageAnalyzer::findEyePoints(const Mat& src, ROIType roi)
 {
     // Find eye contour
     vector<Point> contour;
@@ -122,7 +122,7 @@ void ImageAnalyzer::findEyePoints(Mat& src, ROIType roi)
     ellipse(ff->faceFrameVis, elp, Scalar(255,255,0));
 }
 
-void ImageAnalyzer::findEyebrowPoints(Mat &src, ROIType roi)
+void ImageAnalyzer::findEyebrowPoints(const Mat &src, ROIType roi)
 {
     // Find eyebrow contour
     vector<Point> contour;
@@ -148,7 +148,7 @@ void ImageAnalyzer::findEyebrowPoints(Mat &src, ROIType roi)
     for(int i = 0; i < 3; i++) circle(ff->faceFrameVis, ff->featurePoints[i+off], 2, Scalar(0,255,0), CV_FILLED);
 }
 
-void ImageAnalyzer::findMouthPoints(Mat& src)
+void ImageAnalyzer::findMouthPoints(const Mat& src)
 {
     // Find mouth contour
     vector<Point> contour;
@@ -225,7 +225,7 @@ void ImageAnalyzer::findMouthPoints(Mat& src)
     //imshow("Right", rightROI);
 }
 
-bool ImageAnalyzer::assertROI(Mat& src, Rect roi)
+bool ImageAnalyzer::assertROI(const Mat& src, const Rect& roi)
 {
     return (roi.x + roi.width <= src.cols && roi.x + roi.width <= src.cols
             && roi.y + roi.height <= src.rows && roi.y + roi.height <= src.rows

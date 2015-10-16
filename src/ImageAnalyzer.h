@@ -15,14 +15,14 @@ public:
 
     // General methods
     static void findCorners(vector<Point> contour, Point& p1, Point& p2, bool horizontal);
-    static void findBestContour(Mat& src, vector<Point>& contour, Point offset, ROIType roi = NONE_ROI);
-    static void findBestObject(Mat& src, Rect& dstROI, string dataPath);
-    static bool assertROI(Mat& src, Rect roi);
+    static void findBestContour(const Mat& src, vector<Point>& contour, Point offset, ROIType roi = NONE_ROI);
+    static void findBestObject(const Mat& src, Rect& dstROI, string dataPath);
+    static bool assertROI(const Mat& src, const Rect& roi);
 
     // Specialized
-    static void findEyePoints(Mat& src, ROIType roi);
-    static void findEyebrowPoints(Mat& src, ROIType roi);
-    static void findMouthPoints(Mat& src);
+    static void findEyePoints(const Mat& src, ROIType roi);
+    static void findEyebrowPoints(const Mat& src, ROIType roi);
+    static void findMouthPoints(const Mat& src);
 
 private:
     static FacialFeatures* ff;

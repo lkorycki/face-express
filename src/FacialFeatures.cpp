@@ -30,7 +30,7 @@ FacialFeatures::FacialFeatures()
    ImageProcessor::setFF(this);
 }
 
-void FacialFeatures::detectFace(Mat& src, Mat& dst)
+void FacialFeatures::detectFace(const Mat& src, Mat& dst)
 {
     // Detect with cascade classifier
     Rect faceROI = Rect();
@@ -46,7 +46,7 @@ void FacialFeatures::detectFace(Mat& src, Mat& dst)
     imshow("FaceDet", f);
 }
 
-float* FacialFeatures::extractFacialFeatures(Mat& src)
+float* FacialFeatures::extractFacialFeatures(const Mat& src)
 {
     if(src.empty()) // no face detected
     {
@@ -73,7 +73,7 @@ float* FacialFeatures::extractFacialFeatures(Mat& src)
     return this->featureVector;
 }
 
-void FacialFeatures::setROI(Mat& src)
+void FacialFeatures::setROI(const Mat& src)
 {
     float fw = src.cols;
     float fh = src.rows;
