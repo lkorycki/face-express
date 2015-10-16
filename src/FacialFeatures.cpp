@@ -253,6 +253,7 @@ void FacialFeatures::collectFacialFeatures()
     {
         fv[i] /= nf;
         if(fv[i]  > 1.0) fv[i] = 1.0;
+        else if(fv[i] < 0) fv[i] = 0;
     }
 }
 
