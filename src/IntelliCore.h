@@ -22,14 +22,14 @@ public:
     void trainNN(string dataPath, int maxEpoch, float desiredError, float learningRate, float momentum, bool save);
     void testNN(string testPath);
     void loadNN(string nnPath);
-    float* runNN(float* input);
+    inline float* runNN(float* input);
 
     // SVM and StatModels (for OpenCV models, e.g. k-NN + ensemble)
     void createSVM(int svmType, int kernelType, int gamma = 0);
     void loadSVM(string modelPath);
     void trainModel(StatModel* model, string dataPath, bool save);
     void testModel(StatModel* model, string testPath, bool ensemble = false);
-    float* runModel(StatModel* model, float* input);
+    inline float* runModel(StatModel* model, float* input);
 
     // k-NN
     void createKNN(string dataPath, int k);

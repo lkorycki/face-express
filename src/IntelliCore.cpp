@@ -1,12 +1,13 @@
 #include "IntelliCore.h"
 #include "App.h"
 
-string IntelliCore::emotionTab[EMOTION_NUM] = {"neutral", "happy", "surprise", "anger", "sad", "disgust", "fear" };
+string IntelliCore::emotionTab[EMOTION_NUM] = { "neutral", "happy", "surprise", "anger", "sad", "disgust", "fear" };
 
 IntelliCore::IntelliCore()
 {
     this->neuralNet = new neural_net();
     this->svm = SVM::create();
+    this->knn = KNearest::create();
 }
 
 IntelliCore::IntelliCore(string nnPath, string svmPath, string knnDataPath)
@@ -29,7 +30,8 @@ void IntelliCore::trainNN(string dataPath, int maxEpoch, float desiredError, flo
 {
     training_data trainData = training_data();
     trainData.read_train_from_file(dataPath);
-    trainData.shuffle_train_data();
+    trainData.shuffle_train_data(); // randomize order
+
     this->neuralNet->set_learning_rate(learningRate);
     this->neuralNet->set_learning_momentum(momentum);
 
@@ -47,13 +49,12 @@ void IntelliCore::testNN(string testPath)
 {
     training_data testData = training_data();
     testData.read_train_from_file(testPath);
-    testData.shuffle_train_data();
+    testData.shuffle_train_data(); // randomize order
 
     Mat response = Mat::zeros(EMOTION_NUM, EMOTION_NUM+1, CV_32S);
     int pos = 0;
 
-    cout << endl << "Testing neural network..." << endl;
-    cout.setf(ios::fixed); cout << setprecision(3);
+    cout << "Testing neural network..." << endl;
     int sampleNum = testData.length_train_data();
     for (int i = 0; i < sampleNum; i++)
     {
@@ -66,8 +67,8 @@ void IntelliCore::testNN(string testPath)
         response.at<int>(tar, EMOTION_NUM)++; // sum of target samples
         if(out == tar) pos++;
     }
-    cout << setprecision(6);
-    cout.unsetf(ios::fixed | ios::scientific);
+
+    cout.setf(ios::fixed); cout << setprecision(3);
 
     cout << "Responses:\n" << response << "\n\n";
     cout << "Accuracy: \n";
@@ -77,6 +78,9 @@ void IntelliCore::testNN(string testPath)
 
     this->neuralNet->test_data(testData);
     cout << "\tMSE: " << this->neuralNet->get_MSE() << endl;
+
+    cout << setprecision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
 }
 
 void IntelliCore::loadNN(string nnPath)
@@ -85,7 +89,7 @@ void IntelliCore::loadNN(string nnPath)
     this->neuralNet->create_from_file(nnPath);
 }
 
-float* IntelliCore::runNN(float* input)
+inline float* IntelliCore::runNN(float* input)
 {
     return this->neuralNet->run(input);
 }
@@ -103,12 +107,12 @@ void IntelliCore::trainModel(StatModel* model, string dataPath, bool save)
     Mat input, target;
     loadDataCV(dataPath, input, target);
 
-    cout << endl << "Training SVM..." << endl;
+    cout << "Training model..." << endl;
     model->train(input, ROW_SAMPLE, target);
     cout << endl;
     if(save) {;
         string path = App::pathMap["models"] + "svm_" + Logger::getTime();
-        cout << "Saving created SVM model: " << path << endl;
+        cout << "Saving created model: " << path << endl;
         model->save(path);
     }
 }
@@ -119,8 +123,7 @@ void IntelliCore::testModel(StatModel* model, string testPath, bool ensemble)
     loadDataCV(testPath, input, target);
     int pos = 0;
 
-    cout << endl << "Testing model..." << endl;
-    cout << setprecision(3);
+    cout << "Testing model..." << endl;
     for (int i = 0; i < input.rows; i++)
     {
         int out;
@@ -132,14 +135,17 @@ void IntelliCore::testModel(StatModel* model, string testPath, bool ensemble)
         response.at<int>(tar-1, EMOTION_NUM)++; // sum of target samples
         if(out == tar) pos++;
     }
-    cout << endl;
+
+    cout.setf(ios::fixed); cout << setprecision(3);
 
     cout << "Responses:\n" << response << "\n\n";
     cout << "Accuracy: \n";
     for(int i = 0; i < EMOTION_NUM; i++)
         cout << "\t" << emotionTab[i] << " : " << 100*(float)response.at<int>(i,i) / response.at<int>(i,EMOTION_NUM) << "%\n";
     cout << endl << "\tGENERAL: " << 100*(float)pos / input.rows << "%\n";
+
     cout << setprecision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
 }
 
 void IntelliCore::loadSVM(string modelPath)
@@ -164,7 +170,7 @@ void IntelliCore::loadDataCV(string path, Mat& input, Mat& target)
         // Load input values
         for(int col = 0; col < inputNum; col++)
         {
-            fscanf(file, "%f ", &x);
+            fscanf(file, "%f", &x);
             input.at<float>(row, col) = x;
         }
 
@@ -179,7 +185,7 @@ void IntelliCore::loadDataCV(string path, Mat& input, Mat& target)
     fclose(file);
 }
 
-float* IntelliCore::runModel(StatModel* model, float* input)
+inline float* IntelliCore::runModel(StatModel* model, float* input)
 {
     return new float[1] { model->predict(Mat(1, FEAT_NUM, CV_32F, input)) };
 }
@@ -221,6 +227,8 @@ float* IntelliCore::runClassifier(ClassifierType cType, float* input)
             return runModel(this->knn, input); break;
         case ClassifierType::ENSEMBLE:
             return runEnsemble(input); break;
+        default:
+            return new float[1] { -1 };
     }
 }
 
