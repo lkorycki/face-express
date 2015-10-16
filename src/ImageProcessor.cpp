@@ -240,12 +240,12 @@ void ImageProcessor::preprocessEyebrowROI(Mat& src, Mat& dst, ROIType roi)
     if(roi == L_EB)
     {
         eyeOff = 0;
-        lw = 0.25; lm = 0.85; rw = 0.1; rm = 0.6;
+        lw = 0.2; lm = 0.8; rw = 0.15; rm = 0.65;
     }
     else
     {
         eyeOff = 5;
-        lw = 0.1; lm = 0.6; rw = 0.25; rm = 0.8;
+        lw = 0.15; lm = 0.65; rw = 0.2; rm = 0.8;
     }
 
     // Mask gray borders and binarize
