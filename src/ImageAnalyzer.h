@@ -17,6 +17,7 @@ public:
     static void findCorners(vector<Point> contour, Point& p1, Point& p2, bool horizontal);
     static void findBestContour(Mat& src, vector<Point>& contour, Point offset, ROIType roi = NONE_ROI);
     static void findBestObject(Mat& src, Rect& dstROI, string dataPath);
+    static bool assertROI(Mat& src, Rect roi);
 
     // Specialized
     static void findEyePoints(Mat& src, ROIType roi);

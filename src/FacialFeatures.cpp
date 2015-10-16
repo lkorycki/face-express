@@ -181,8 +181,7 @@ void::FacialFeatures::extractTeethParam()
             this->featurePoints[off+2].x - this->featurePoints[off].x,
             this->featurePoints[off+3].y - this->featurePoints[off+1].y);
 
-    if(teethRect.x + teethRect.width > this->faceFrame.cols
-            || teethRect.y + teethRect.height > this->faceFrame.rows ) return; // too big ROI
+    if(!ImageAnalyzer::assertROI(this->faceFrame, teethRect)) return;
     ROI[TEETH] = this->faceFrame(teethRect);
 
     // Binarize
@@ -205,7 +204,6 @@ void::FacialFeatures::extractNosePoints()
     int off = this->featPointOffsets[NOSE];
     Rect noseROI;
     ImageAnalyzer::findBestObject(ROI[NOSE], noseROI, "../data/nose_cascade.xml");
-
     if(!noseROI.area() && !this->featurePoints[off].x) return; // has not been found yet
 
     noseROI.x = noseROI.x + this->roiOffsets[NOSE].x; noseROI.y = noseROI.y + this->roiOffsets[NOSE].y; // equivalent of finding contours
@@ -218,7 +216,7 @@ void::FacialFeatures::extractNosePoints()
     line(this->faceFrameVis, Point(this->featurePoints[off].x-5, this->featurePoints[off].y),
          Point(this->featurePoints[off].x+5, this->featurePoints[off].y), Scalar(0,255,255));
     circle(this->faceFrameVis, this->featurePoints[off], 2, Scalar(0,255,0), CV_FILLED);
-
+    cout << "test3\n";
     //imshow("work1", this->faceFrame(noseROI));
 }
 

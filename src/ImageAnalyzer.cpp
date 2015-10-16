@@ -181,9 +181,7 @@ void ImageAnalyzer::findMouthPoints(Mat& src)
     Point leftOffset = Point(lc.x-a*fw, lc.y-a*fh); Point rightOffset = Point(rc.x-a*fw, rc.y-a*fh);
     Rect lr = Rect(leftOffset.x, leftOffset.y, 2*a*fw, 2*a*fh);
     Rect rr = Rect(rightOffset.x, rightOffset.y, 2*a*fw, 2*a*fh);
-    if(lr.x + lr.width > ff->faceFrame.cols || rr.x + rr.width > ff->faceFrame.cols
-            || lr.y + lr.height > ff->faceFrame.rows || rr.y + rr.height > ff->faceFrame.rows
-            || lr.x < 0 || lr.y < 0 || rr.x < 0 || rr.y < 0) return; // too big
+    if(!assertROI(ff->faceFrame, lr) || !assertROI(ff->faceFrame, rr)) return;
 
     Mat leftROI = ff->faceFrame(lr);
     Mat rightROI = ff->faceFrame(rr);
@@ -225,6 +223,13 @@ void ImageAnalyzer::findMouthPoints(Mat& src)
 
     //imshow("Left", leftROI);
     //imshow("Right", rightROI);
+}
+
+bool ImageAnalyzer::assertROI(Mat& src, Rect roi)
+{
+    return (roi.x + roi.width <= src.cols && roi.x + roi.width <= src.cols
+            && roi.y + roi.height <= src.rows && roi.y + roi.height <= src.rows
+            && roi.x >= 0 && roi.y >= 0 && roi.x >= 0 && roi.y >= 0);
 }
 
 ImageAnalyzer::~ImageAnalyzer()
