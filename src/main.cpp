@@ -5,6 +5,7 @@ int main(int argc, char *argv[])
 {
     App app = App();
     app.runCam(0);
+       //app.runImage("/media/lukas/FE9E3DD89E3D89E3/Studia/Praca_dyplomowa/Dokumentacja/screens/2-1_ok.png");
 
 //    IntelliCore ic = IntelliCore("/home/lukas/Projects/PD/models/nn_model_float",
 //                                  "/home/lukas/Projects/PD/models/svm_model",

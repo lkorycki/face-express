@@ -5,6 +5,7 @@
 #include "FacialFeatures.h"
 #include "IntelliCore.h"
 #include "Logger.h"
+#include "Utils.h"
 
 class App
 {

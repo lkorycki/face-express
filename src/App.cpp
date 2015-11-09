@@ -45,8 +45,9 @@ void App::runCam(int camId)
     while(1)
     {
         Mat frame; cap >> frame;
-        resize(frame, frame, Size(860, 640), 1.0, 1.0, INTER_CUBIC);
-        //imshow("Video", frame);
+        //resize(frame, frame, Size(1024, 768), 1.0, 1.0, INTER_CUBIC);
+        //cout << frame.cols << " : " << frame.rows << endl;
+        //imshow("FaceDet", frame);
 
         // Process the image
         Mat faceFrame = Mat();
