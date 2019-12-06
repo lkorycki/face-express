@@ -2,10 +2,14 @@
 
 Real-time face feature extraction and emotion recognition from facial expressions.
 
-![](./doc/ex3.png)
+<p align="center">
+<img src="./doc/ex3.png" width="640">
 
-![](./doc/ex1.png)
 
-![](./doc/ex2.png)
+<img src="./doc/ex2.png" width="640">
+
+
+<img src="./doc/ex1.png" width="640">
+</p>
 
 For **more examples** check: *doc*.
