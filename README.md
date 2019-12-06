@@ -1,9 +1,11 @@
 # face-express
 
-Real-time emotion recognition using facial expressions.
+Real-time face feature extraction and emotion recognition from facial expressions.
 
-![](./doc/ex3.png =500x400)
+![](./doc/ex3.png)
 
-![](./doc/ex1.png?raw=true)
+![](./doc/ex1.png)
 
-![](./doc/ex2.png?raw=true "Title")
+![](./doc/ex2.png)
+
+For **more examples** check: *doc*.
