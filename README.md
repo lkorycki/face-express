@@ -1,6 +1,8 @@
 # face-express
 
-Real-time face feature extraction and emotion recognition from facial expressions.
+### Real-time face feature extraction and emotion recognition from facial expressions.
+
+For **more examples** check: *doc*.
 
 <p align="center">
 <img src="./doc/ex3.png" width="640">
@@ -11,5 +13,3 @@ Real-time face feature extraction and emotion recognition from facial expression
 
 <img src="./doc/ex1.png" width="640">
 </p>
-
-For **more examples** check: *doc*.
